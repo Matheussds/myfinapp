@@ -25,7 +25,7 @@ export default function RowValue({ value, currentInstallment, totalInstallments,
                 :
                 <>
                     <Text style={{ width: '33%', fontSize: 20, color: color }}>{formatter.format(value)}</Text>
-                    <Text style={{ width: '33%', fontSize: 16, color: 'gray', textAlign: 'center' }}>{currentInstallment} de {totalInstallments}</Text> : null
+                    <Text style={{ width: '33%', fontSize: 16, color: 'gray', textAlign: 'center' }}>{currentInstallment} de {totalInstallments}</Text>
                     <Text style={{ width: '33%', fontSize: 16, color: 'gray', textAlign: 'right' }}>{description}</Text>
                 </>
             }

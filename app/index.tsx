@@ -1,7 +1,7 @@
-import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
+import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Card from "@/components/ui/Card";
-import React from "react";
+import React, { useState } from "react";
 import { RowDate } from "@/components/ui/RowDate";
 import RowValue from "@/components/ui/RowValue";
 import RowSeparator from "@/components/ui/RowSeparator";
@@ -9,6 +9,8 @@ import HeaderApp from "@/components/ui/HeaderApp";
 import FooterApp from "@/components/ui/FooterApp";
 import FooterContext from "@/components/ui/FooterContext";
 import HeaderContext from "@/components/ui/HeaderContext";
+import ChooseDisplay from "@/components/ui/ChooseDisplay";
+import MyModal from "@/components/ui/Modal";
 
 // Proximas  features:
 // Cadastrar o nome dos cartões de crédito
@@ -45,6 +47,9 @@ type InstallmentsList = {
 
 
 export default function Index() {
+  const [openParcelas, setOpenParcelas] = useState(false);
+  const [openModalCategory, setOpenModalCategory] = useState(true);
+
   // crie um array de objetos com os valores que podem ter dentreo do valueContainer component
   // acrsescente também os objetos que não tem todos os valores preenchidos
   const dayList: DayList[] = [
@@ -127,35 +132,53 @@ export default function Index() {
   }, ...day.values.map((value) => ({
     ...value,
     key: generateKey(), // Pode ajustar para garantir que seja único
-  }))]);
+  })),
+  ]);
+
+  const flattenedDataInstallments = installments.map(installment => ({
+    ...installment,
+    key: generateKey(), // Pode ajustar para garantir que seja único
+  }));
+
+  const btnpressioned = () => {
+    setOpenModalCategory(true);
+    console.log('Botão pressionado');
+  }
 
   const colorBlue = '#052BC2';
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor="#02145C" />
       <HeaderApp />
-      <HeaderContext />
+      <HeaderContext onAdd={btnpressioned} />
       <View style={styles.contentContainer}>
         <Card>
-          <FlatList
-            data={flattenedData}
-            renderItem={renderDay}
-            keyExtractor={(item) => item.key} // Chave única para cada item
-          />
-          {installments.length > 0 && (
-            <View style={styles.installmentsTitle}>
-              <Text style={{ fontSize: 16, color: '#fff' }}>Parcelas</Text>
-            </View>
-          )}
-          <FlatList
-            data={installments}
-            renderItem={renderInstallments}
-            keyExtractor={(item) => item.value.toString()} // Chave única para cada item
-          />
+          {!openParcelas ?
+            <FlatList
+              data={flattenedData}
+              renderItem={renderDay}
+              keyExtractor={(item) => item.key} // Chave única para cada item
+            />
+            :
+            <React.Fragment>
+
+              <View style={styles.installmentsTitle}>
+                <Text style={{ fontSize: 16, color: '#fff' }}>Parcelas</Text>
+              </View>
+
+              <FlatList
+                data={flattenedDataInstallments}
+                renderItem={renderInstallments}
+                keyExtractor={(item) => item.key}
+              />
+            </React.Fragment>
+          }
         </Card>
+        <ChooseDisplay onSetOpenParcelas={setOpenParcelas} />
       </View>
       <FooterContext />
       <FooterApp />
+      <MyModal modalVisible={openModalCategory} onSetVisible={setOpenModalCategory} />
     </SafeAreaView>
   );
 }
@@ -172,7 +195,8 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     justifyContent: 'space-between',
-    paddingHorizontal: 8
+    paddingHorizontal: 8,
+    gap: 8
   },
   installmentsTitle: {
     flexDirection: 'row',

@@ -1,20 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import ButtonCircle from "./ButtonCircle";
 
-export default function HeaderContext() {
+export default function HeaderContext({ onAdd }: { onAdd: () => void }) {
     return (
         <View style={styles.cardHeader}>
-            <View style={{ backgroundColor: '#000', borderRadius: '100%', padding: 14 }}>
-                <Ionicons name="add" size={40} color='#fff' />
-            </View>
+            <ButtonCircle backgroundColor='#000' onPressAdd={onAdd} />
             <View style={{ flex: 1, flexDirection: 'row', height: 70, alignItems: "center", justifyContent: 'center', backgroundColor: '#000', borderTopStartRadius: 50, borderBottomStartRadius: 50 }}>
-                <View style={{ flex: 1, alignItems: 'flex-start', paddingStart: 20 }}>
+                <TouchableOpacity style={{ flex: 1, alignItems: 'flex-start', paddingStart: 20 }}>
                     <Ionicons name="chevron-back" size={24} color="#fff" />
-                </View>
+                </TouchableOpacity>
                 <Text style={{ fontSize: 18, color: '#fff', flex: 1, textAlign: 'center' }}>Geral</Text>
-                <View style={{ flex: 1, alignItems: 'flex-end', paddingEnd: 20 }}>
+                <TouchableOpacity style={{ flex: 1, alignItems: 'flex-end', paddingEnd: 20 }}>
                     <Ionicons name="chevron-forward" size={24} color="#fff" />
-                </View>
+                </TouchableOpacity>
             </View>
         </View>
     )

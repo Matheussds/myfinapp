@@ -3,7 +3,7 @@ import ButtonCircle from "./ButtonCircle";
 
 export default function FooterContext() {
     const colorBlue = '#052BC2';
-    
+
     return (
         <View style={styles.container}>
             <View style={{ height: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', flex: 1, borderTopRightRadius: 100, borderBottomRightRadius: 100, padding: 4, paddingHorizontal: 12 }}>
@@ -14,7 +14,7 @@ export default function FooterContext() {
                 </View>
             </View>
 
-            <ButtonCircle backgroundColor={colorBlue} />
+            <ButtonCircle backgroundColor={colorBlue} onPressAdd={() => null}/>
         </View>
     )
 }
