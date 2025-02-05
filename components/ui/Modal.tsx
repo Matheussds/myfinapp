@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
-import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ReactNode, useEffect, useState } from "react";
+import { Modal, StyleSheet, View } from "react-native";
 
-const MyModal = (props: { modalVisible: boolean, onSetVisible: (isVisible: boolean) => void }) => {
+const MyModal = (props: { modalVisible: boolean, children: ReactNode }) => {
     const [modalVisible, setModalVisible] = useState(false);
-    const [inputValue, setInputValue] = useState('');
-
+   
     useEffect(() => {
         setModalVisible(props.modalVisible);
     }, [props.modalVisible]);
-
-    const onSetModalVisible = (visible: boolean) => {
-        setModalVisible(visible);
-        props.onSetVisible(visible);
-    }
 
     return (
         <Modal
@@ -23,20 +17,7 @@ const MyModal = (props: { modalVisible: boolean, onSetVisible: (isVisible: boole
         >
             <View style={styles.modalOverlay}>
                 <View style={styles.modalView}>
-                    <Text style={styles.modalText}>Adicionar uma nova categoria</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite a categoria aqui..."
-                        value={inputValue}
-                        onChangeText={(text) => setInputValue(text)}
-                    />
-                    <Text style={styles.resultText}>Você digitou: {inputValue}</Text>
-                    <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => onSetModalVisible(false)}
-                    >
-                        <Text style={styles.buttonText}>Fechar</Text>
-                    </TouchableOpacity>
+                    {props.children}
                 </View>
             </View>
         </Modal>

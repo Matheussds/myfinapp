@@ -11,6 +11,8 @@ import FooterContext from "@/components/ui/FooterContext";
 import HeaderContext from "@/components/ui/HeaderContext";
 import ChooseDisplay from "@/components/ui/ChooseDisplay";
 import MyModal from "@/components/ui/Modal";
+import ModalCategory from "@/components/ui/ModalCategory";
+import ModalExpense from "@/components/ui/ModalExpense";
 
 // Proximas  features:
 // Cadastrar o nome dos cartões de crédito
@@ -48,7 +50,8 @@ type InstallmentsList = {
 
 export default function Index() {
   const [openParcelas, setOpenParcelas] = useState(false);
-  const [openModalCategory, setOpenModalCategory] = useState(true);
+  const [openModalCategory, setOpenModalCategory] = useState(false);
+  const [openModalExpense, setOpenModalExpense] = useState(false);
 
   // crie um array de objetos com os valores que podem ter dentreo do valueContainer component
   // acrsescente também os objetos que não tem todos os valores preenchidos
@@ -140,17 +143,12 @@ export default function Index() {
     key: generateKey(), // Pode ajustar para garantir que seja único
   }));
 
-  const btnpressioned = () => {
-    setOpenModalCategory(true);
-    console.log('Botão pressionado');
-  }
-
   const colorBlue = '#052BC2';
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor="#02145C" />
       <HeaderApp />
-      <HeaderContext onAdd={btnpressioned} />
+      <HeaderContext onAdd={() => setOpenModalCategory(true)} />
       <View style={styles.contentContainer}>
         <Card>
           {!openParcelas ?
@@ -176,9 +174,10 @@ export default function Index() {
         </Card>
         <ChooseDisplay onSetOpenParcelas={setOpenParcelas} />
       </View>
-      <FooterContext />
+      <FooterContext onAdd={() => setOpenModalExpense(true)} />
       <FooterApp />
-      <MyModal modalVisible={openModalCategory} onSetVisible={setOpenModalCategory} />
+      <ModalCategory modalVisible={openModalCategory} onSetVisible={setOpenModalCategory} />
+      <ModalExpense modalVisible={openModalExpense} onSetVisible={setOpenModalExpense} />
     </SafeAreaView>
   );
 }

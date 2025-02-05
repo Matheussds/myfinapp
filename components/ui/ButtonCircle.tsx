@@ -1,10 +1,11 @@
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ReactNode } from 'react';
 
-export default function ButtonCircle( { backgroundColor, onPressAdd }: { backgroundColor: string, onPressAdd: () => void } ) {
+export default function ButtonCircle( { backgroundColor, onPressAdd, children }: { backgroundColor: string, onPressAdd: () => void, children?: ReactNode } ) {
     return (
         <TouchableOpacity style={[styles.buttonCircle, { backgroundColor }]} onPress={onPressAdd}>
-            <Ionicons name="add" size={40} color='#fff' />
+            { children ? children : <Ionicons name="add" size={40} color='#fff' /> }
         </TouchableOpacity>
     )
 }
