@@ -1,6 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from "expo-linear-gradient";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HeaderApp() {
     return (
@@ -9,9 +9,11 @@ export default function HeaderApp() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}>
                 <View style={{ justifyContent: 'flex-end', alignItems: 'flex-end', height: 30 }}>
-                    <Ionicons name="ellipsis-horizontal" size={50} color="#fff" />
+                    <TouchableOpacity style={{ backgroundColor: '#E8E2E2', width:80, height: 40, justifyContent: 'center', alignItems: 'flex-end',  borderBottomLeftRadius: 50 }}>
+                        <MaterialIcons name="menu-open" size={38} color="#052BC2" />
+                    </TouchableOpacity>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', flex: 1, paddingBottom: 4 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', flex: 1, padding: 4 }}>
                     <View style={{ paddingStart: 40 }}>
                         <Text style={{ color: '#fff' }}>M 2.000,00</Text>
                         <Text style={{ color: '#fff' }}>D 100,00</Text>
@@ -29,9 +31,10 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 50
     },
     gradientContainer: {
+        paddingTop: 10,
         height: 80,
         width: '100%',
-        paddingHorizontal: 8,
+        // paddingHorizontal: 8,
         borderBottomLeftRadius: 50
     },
 })

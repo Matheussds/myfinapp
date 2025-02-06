@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
-const MyModal = (props: { modalVisible: boolean, children: ReactNode }) => {
+const MyModal = (props: { modalVisible: boolean, children: ReactNode}) => {
     const [modalVisible, setModalVisible] = useState(false);
    
     useEffect(() => {
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
-        padding: 20,
+        // padding: 20,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOpacity: 0.25,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MyModal from "./Modal";
-import { StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { BottomTabBar } from "@react-navigation/bottom-tabs";
 
 export default function ModalExpense(props: { modalVisible: boolean, onSetVisible: (isVisible: boolean) => void }) {
@@ -16,40 +16,46 @@ export default function ModalExpense(props: { modalVisible: boolean, onSetVisibl
         setModalVisible(props.modalVisible);
     }, [props.modalVisible])
 
+    const colorBlue = '#052BC2';
+
     return (
         <MyModal modalVisible={modalVisible}>
-            <Text style={styles.modalText}>Adicionar um novo gasto</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Valor do gasto..."
-                value={inputValue}
-                onChangeText={(text) => setInputValue(text)}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Descrição do gasto..."
-                value={inputValue}
-                onChangeText={(text) => setInputValue(text)}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Forma de pagamento..."
-                value={inputValue}
-                onChangeText={(text) => setInputValue(text)}
-            />
-            <Text style={styles.resultText}>Você digitou: {inputValue}</Text>
-            <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => onSetModalVisible(false)}
-            >
-                <Text style={styles.buttonText}>Fechar</Text>
-            </TouchableOpacity>
+            <View style={{ width: '100%', alignItems: "center", padding: 20 }}>
+                <Text style={styles.modalText}>Adicionar um novo gasto</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Valor do gasto..."
+                    value={inputValue}
+                    onChangeText={(text) => setInputValue(text)}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Descrição do gasto..."
+                    value={inputValue}
+                    onChangeText={(text) => setInputValue(text)}
+                />
+            </View>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: '#da330d', borderRightWidth: 1, borderRightColor: '#ccc' }]}
+                    onPress={() => onSetModalVisible(false)}
+                >
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: colorBlue, borderLeftWidth: 1, borderLeftColor: '#ccc' }]}
+                    onPress={() => onSetModalVisible(false)}
+                >
+                    <Text style={styles.buttonText}>Adicionar</Text>
+                </TouchableOpacity>
+            </View>
         </MyModal>
     )
 }
 
 const styles = StyleSheet.create({
     buttonText: {
+        textAlign: 'center',
         color: '#FFFFFF',
         fontSize: 16,
     },
@@ -58,10 +64,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 18,
     },
-    closeButton: {
-        backgroundColor: '#FF5733',
+    button: {
+        width: '50%',
         padding: 10,
-        borderRadius: 5,
     },
     input: {
         height: 50,

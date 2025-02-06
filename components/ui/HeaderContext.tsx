@@ -10,6 +10,7 @@ export default function HeaderContext({ onAdd }: { onAdd: () => void }) {
                 <TouchableOpacity style={{ flex: 1, alignItems: 'flex-start', paddingStart: 20 }}>
                     <Ionicons name="chevron-back" size={24} color="#fff" />
                 </TouchableOpacity>
+                {/* Ao tocar na categoria abrir modal com todas as categorias para escolher uma */}
                 <Text style={{ fontSize: 18, color: '#fff', flex: 1, textAlign: 'center' }}>Geral</Text>
                 <TouchableOpacity style={{ flex: 1, alignItems: 'flex-end', paddingEnd: 20 }}>
                     <Ionicons name="chevron-forward" size={24} color="#fff" />

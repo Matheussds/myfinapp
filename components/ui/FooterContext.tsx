@@ -2,15 +2,21 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ButtonCircle from "./ButtonCircle";
 import { Fragment, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function FooterContext({ onAdd }: { onAdd: (paymentMethod: 'Card' | 'Money') => void }) {
     const [openPaymentMethod, setOpenPaymentMethod] = useState(false);
 
     const colorBlue = '#052BC2';
 
+    const handleAdd = (paymentMethod: 'Card' | 'Money') => {
+        setOpenPaymentMethod(false);
+        onAdd(paymentMethod);
+    }
+
     return (
         <View style={styles.container}>
-            <View style={{ height: 68, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', flex: 1, borderTopRightRadius: 100, borderBottomRightRadius: 100, padding: 4, paddingHorizontal: 12 }}>
+            <View style={{ height: 70, width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', flex: 1, borderTopRightRadius: 100, borderBottomRightRadius: 100, padding: 4, paddingHorizontal: 12 }}>
                 {!openPaymentMethod ?
                     <Fragment>
                         <Text style={{ fontSize: 20 }}>Total</Text>
@@ -21,11 +27,15 @@ export default function FooterContext({ onAdd }: { onAdd: (paymentMethod: 'Card'
                     </Fragment>
                     :
                     <Fragment>
-                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => onAdd('Card')}>
-                            <Text style={{ textAlign: "center" }}>Cartão</Text>
+                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%', borderRightWidth: 1, borderColor: colorBlue }} onPress={() => handleAdd('Card')}>
+                            <Text style={{ textAlign: "center" }}>
+                                <FontAwesome6 name="credit-card" size={36} color={colorBlue} />
+                            </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => onAdd('Money')}>
-                            <Text style={{ textAlign: "center" }}>Dinheiro</Text>
+                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%', borderLeftWidth: 1, borderColor: colorBlue }} onPress={() => handleAdd('Money')}>
+                            <Text style={{ textAlign: "center" }}>
+                                <FontAwesome6 name="money-bill-wave" size={36} color="#0ba313" />
+                            </Text>
                         </TouchableOpacity>
                     </Fragment>
                     // <View style={{ flexDirection: 'row', gap: 8, backgroundColor: '#fff', padding: 4, paddingHorizontal: 12, borderRadius: 100 }}>
@@ -42,6 +52,7 @@ export default function FooterContext({ onAdd }: { onAdd: (paymentMethod: 'Card'
 
 const styles = StyleSheet.create({
     container: {
+        width: '100%',
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: 'center',
