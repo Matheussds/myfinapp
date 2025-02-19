@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import MyModal from "./Modal";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { BottomTabBar } from "@react-navigation/bottom-tabs";
 
 export default function ModalExpense(props: { modalVisible: boolean, onSetVisible: (isVisible: boolean) => void }) {
     const [inputValue, setInputValue] = useState('');

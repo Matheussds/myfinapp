@@ -27,12 +27,12 @@ export default function FooterContext({ onAdd }: { onAdd: (paymentMethod: 'Card'
                     </Fragment>
                     :
                     <Fragment>
-                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%', borderRightWidth: 1, borderColor: colorBlue }} onPress={() => handleAdd('Card')}>
+                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => handleAdd('Card')}>
                             <Text style={{ textAlign: "center" }}>
                                 <FontAwesome6 name="credit-card" size={36} color={colorBlue} />
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%', borderLeftWidth: 1, borderColor: colorBlue }} onPress={() => handleAdd('Money')}>
+                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => handleAdd('Money')}>
                             <Text style={{ textAlign: "center" }}>
                                 <FontAwesome6 name="money-bill-wave" size={36} color="#0ba313" />
                             </Text>
@@ -43,8 +43,8 @@ export default function FooterContext({ onAdd }: { onAdd: (paymentMethod: 'Card'
                     // </View>
                 }
             </View>
-            <ButtonCircle backgroundColor={!openPaymentMethod ? colorBlue : '#db0c0c'} onPressAdd={() => setOpenPaymentMethod(!openPaymentMethod)}>
-                {openPaymentMethod && <Ionicons name="close" size={40} color="#fff" />}
+            <ButtonCircle backgroundColor={!openPaymentMethod ? colorBlue : '#fff'} onPressAdd={() => setOpenPaymentMethod(!openPaymentMethod)}>
+                {openPaymentMethod && <Ionicons name="close" size={40} color="#db0c0c" />}
             </ButtonCircle>
         </View>
     )

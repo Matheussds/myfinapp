@@ -1,7 +1,7 @@
-import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Card from "@/components/ui/Card";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RowDate } from "@/components/ui/RowDate";
 import RowValue from "@/components/ui/RowValue";
 import RowSeparator from "@/components/ui/RowSeparator";
@@ -13,6 +13,9 @@ import ChooseDisplay from "@/components/ui/ChooseDisplay";
 import MyModal from "@/components/ui/Modal";
 import ModalCategory from "@/components/ui/ModalCategory";
 import ModalExpense from "@/components/ui/ModalExpense";
+import ModalFull from "@/components/ui/ModalFull";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "expo-router";
 
 // Proximas  features:
 // Cadastrar o nome dos cartões de crédito
@@ -49,9 +52,13 @@ type InstallmentsList = {
 
 
 export default function Index() {
+  const router = useRouter();
+  const { isAuthenticated, signOut } = useAuth();
+  const [loading, setLoading] = useState(true); // Estado de carregamento
   const [openParcelas, setOpenParcelas] = useState(false);
   const [openModalCategory, setOpenModalCategory] = useState(false);
   const [openModalExpense, setOpenModalExpense] = useState(false);
+  const [openModalAppSettings, setOpenModalAppSettings] = useState(false);
 
   // crie um array de objetos com os valores que podem ter dentreo do valueContainer component
   // acrsescente também os objetos que não tem todos os valores preenchidos
@@ -144,10 +151,31 @@ export default function Index() {
   }));
 
   const colorBlue = '#052BC2';
+
+  useEffect(() => {
+    // Simular uma verificação inicial, pode ser um fetch de autenticação
+    const checkAuth = async () => {
+      setLoading(false); // Após a verificação, pare o carregamento
+      if (!isAuthenticated) {
+        router.push('/login'); // Redireciona para a tela de login
+      }
+    };
+
+    checkAuth();
+  }, [isAuthenticated]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor="#02145C" />
-      <HeaderApp />
+      <HeaderApp onOpenMenu={() => setOpenModalAppSettings(true)} />
       <HeaderContext onAdd={() => setOpenModalCategory(true)} />
       <View style={styles.contentContainer}>
         <Card>
@@ -178,11 +206,17 @@ export default function Index() {
       <FooterApp />
       <ModalCategory modalVisible={openModalCategory} onSetVisible={setOpenModalCategory} />
       <ModalExpense modalVisible={openModalExpense} onSetVisible={setOpenModalExpense} />
+      <ModalFull isVisible={openModalAppSettings} onClose={() => setOpenModalAppSettings(false)} />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     gap: 8,
