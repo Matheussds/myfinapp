@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MyModal from "./Modal";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-export default function ModalCategory(props: { modalVisible: boolean, onSetVisible: (isVisible: boolean) => void }) {
+export default function ModalCategory(props: { modalVisible: boolean, onSetVisible: (isVisible: boolean) => void, onAddCategory: (category: string) => void }) {
     const [inputValue, setInputValue] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -11,11 +11,16 @@ export default function ModalCategory(props: { modalVisible: boolean, onSetVisib
         props.onSetVisible(visible);
     }
 
+    const addCategory = () => {
+        console.log('Adicionando categoria', inputValue);
+        props.onAddCategory(inputValue);
+        setInputValue('');
+        onSetModalVisible(false);
+    }
+
     useEffect(() => {
         setModalVisible(props.modalVisible);
     }, [props.modalVisible])
-
-    const colorBlue = '#052BC2';
 
     return (
         <MyModal modalVisible={modalVisible}>
@@ -36,8 +41,8 @@ export default function ModalCategory(props: { modalVisible: boolean, onSetVisib
                     <Text style={styles.buttonText}>Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: colorBlue, borderLeftWidth: 1, borderLeftColor: '#ccc' }]}
-                    onPress={() => onSetModalVisible(false)}
+                    style={[styles.button, { backgroundColor: '#000', borderLeftWidth: 1, borderLeftColor: '#ccc' }]}
+                    onPress={addCategory}
                 >
                     <Text style={styles.buttonText}>Adicionar</Text>
                 </TouchableOpacity>

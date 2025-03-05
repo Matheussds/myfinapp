@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -16,10 +17,13 @@ const Login: React.FC = () => {
     const router = useRouter();
 
     useEffect(() => {
+        console.log('rodou');
         console.log(response);
-        if (response?.type === 'success') {
-            const { authentication } = response;
-            // Aqui você pode tratar o token e fazer a autenticação 
+        // if (response?.type === 'success') {
+        if (response?.type === 'dismiss') {
+            // const { authentication } = response;
+            // Aqui você pode tratar o token e fazer a autenticação
+            // console.log(authentication); 
 
             signIn(); // Chama a função para marcar como autenticado
             router.push('/'); // Redireciona para a tela inicial após o login
@@ -29,11 +33,10 @@ const Login: React.FC = () => {
     return (
         <View style={styles.container}>
             <Text>Login Screen</Text>
-            <Button
-                title="Sign in with Google"
-                disabled={!request}
-                onPress={() => promptAsync()}
-            />
+            <TouchableOpacity style={styles.button} onPress={() => promptAsync()}>
+                <MaterialCommunityIcons name="google" size={24} color="white" style={styles.icon} />
+                <Text style={styles.buttonText}>Acessar com Google</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -43,6 +46,23 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    button: {
+        backgroundColor: '#4285F4',
+        padding: 15,
+        borderRadius: 5,
+        width: '80%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        marginLeft: 10, // Espaço entre o ícone e o texto
+    },
+    icon: {
+        marginRight: 10, // Espaço entre o ícone e o texto
     },
 });
 

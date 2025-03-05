@@ -4,14 +4,15 @@ import { Fragment, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-export default function FooterContext({ onAdd }: { onAdd: (paymentMethod: 'Card' | 'Money') => void }) {
+export default function FooterContext({ onMethodSelected }: { onMethodSelected: (paymentMethod: 'CARD' | 'MONEY') => void }) {
     const [openPaymentMethod, setOpenPaymentMethod] = useState(false);
 
     const colorBlue = '#052BC2';
 
-    const handleAdd = (paymentMethod: 'Card' | 'Money') => {
+    const handleAdd = (paymentMethod: 'CARD' | 'MONEY') => {
         setOpenPaymentMethod(false);
-        onAdd(paymentMethod);
+        console.log(paymentMethod);
+        onMethodSelected(paymentMethod);
     }
 
     return (
@@ -27,12 +28,12 @@ export default function FooterContext({ onAdd }: { onAdd: (paymentMethod: 'Card'
                     </Fragment>
                     :
                     <Fragment>
-                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => handleAdd('Card')}>
+                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => handleAdd('CARD')}>
                             <Text style={{ textAlign: "center" }}>
                                 <FontAwesome6 name="credit-card" size={36} color={colorBlue} />
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => handleAdd('Money')}>
+                        <TouchableOpacity style={{ height: '100%', justifyContent: "center", width: '50%' }} onPress={() => handleAdd('MONEY')}>
                             <Text style={{ textAlign: "center" }}>
                                 <FontAwesome6 name="money-bill-wave" size={36} color="#0ba313" />
                             </Text>

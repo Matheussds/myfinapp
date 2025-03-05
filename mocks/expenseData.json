@@ -1,0 +1,134 @@
+[
+    {
+        "categoryId": "1",
+        "category": "Alimentação",
+        "dates": [{
+            "year": 2021,
+            "month": 1,
+            "expenseList": [
+                {
+                    "maxValue": 100.00,
+                    "date": "14/01",
+                    "values": [
+                        {
+                            "value": 50.00,
+                            "description": "Carregador"
+                        },
+                        {
+                            "value": 50.00,
+                            "description": ""
+                        }
+                    ]
+                },
+                {
+                    "maxValue": 100.00,
+                    "date": "12/01",
+                    "values": [
+                        {
+                            "value": 100.00,
+                            "description": "Fruteira"
+                        },
+                        {
+                            "value": 50.00,
+                            "description": ""
+                        },
+                        {
+                            "value": 20.50,
+                            "description": ""
+                        },
+                        {
+                            "value": 16.80,
+                            "description": ""
+                        }
+                    ]
+                }
+            ],
+            "installments": [
+                {
+                    "value": 50.00,
+                    "currentInstallment": 1,
+                    "totalInstallments": 10,
+                    "description": "Carregador"
+                },
+                {
+                    "value": 50.00,
+                    "currentInstallment": 1,
+                    "totalInstallments": 10,
+                    "description": "Carregador"
+                },
+                {
+                    "value": 100.00,
+                    "currentInstallment": 1,
+                    "totalInstallments": 10,
+                    "description": "Carregador"
+                }
+            ]
+        }]
+    },
+    {
+        "categoryId": "2",
+        "category": "Transporte",
+        "dates": [{
+            "year": 2021,
+            "month": 1,
+            "expenseList": [
+                {
+                    "maxValue": 100.00,
+                    "date": "14/01",
+                    "values": [
+                        {
+                            "value": 50.00,
+                            "description": "Carregador3"
+                        },
+                        {
+                            "value": 50.00,
+                            "description": ""
+                        }
+                    ]
+                },
+                {
+                    "maxValue": 100.00,
+                    "date": "12/01",
+                    "values": [
+                        {
+                            "value": 100.00,
+                            "description": "Fruteira"
+                        },
+                        {
+                            "value": 50.00,
+                            "description": ""
+                        },
+                        {
+                            "value": 20.50,
+                            "description": ""
+                        },
+                        {
+                            "value": 16.80,
+                            "description": ""
+                        }
+                    ]
+                }
+            ],
+            "installments": [
+                {
+                    "value": 50.00,
+                    "currentInstallment": 1,
+                    "totalInstallments": 10,
+                    "description": "Carregador"
+                },
+                {
+                    "value": 50.00,
+                    "currentInstallment": 1,
+                    "totalInstallments": 10,
+                    "description": "Carregador"
+                },
+                {
+                    "value": 100.00,
+                    "currentInstallment": 1,
+                    "totalInstallments": 10,
+                    "description": "Carregador"
+                }
+            ]
+        }]
+    }
+]

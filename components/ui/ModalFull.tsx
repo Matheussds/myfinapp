@@ -2,18 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 
 const ModalFull = (props: { isVisible: boolean, onClose: () => void }) => {
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(props.isVisible);
     const [isEnabled, setIsEnabled] = useState(false);
 
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
     const handleModalClose = () => {
         setModalVisible(false);
+        console.log("ModalFull handleModalClose");
         props.onClose();
     }
 
     useEffect(() => {
         setModalVisible(props.isVisible);
+        console.log('ModalFull isVisible', props.isVisible);
     }, [props.isVisible]);
 
     return (
@@ -21,7 +23,6 @@ const ModalFull = (props: { isVisible: boolean, onClose: () => void }) => {
             animationType="slide"
             transparent={false}
             visible={modalVisible}
-            onRequestClose={handleModalClose}
         >
             <View style={styles.fullScreenModal}>
                 <Text style={styles.modalTitle}>Configurações do Aplicativo</Text>
@@ -40,7 +41,7 @@ const ModalFull = (props: { isVisible: boolean, onClose: () => void }) => {
                 {/* Botão para fechar o modal */}
                 <TouchableOpacity
                     style={styles.closeButton}
-                    onPress={() => setModalVisible(false)}
+                    onPress={() => handleModalClose()}
                 >
                     <Text style={styles.buttonText}>Fechar</Text>
                 </TouchableOpacity>
@@ -53,20 +54,23 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#FFFFFF',
         fontSize: 16,
+        textAlign: 'right',
     },
     fullScreenModal: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-        padding: 20,
+        // padding: 20,
+
     },
     modalTitle: {
         fontSize: 24,
-        marginBottom: 20,
+        marginVertical: 20,
         fontWeight: 'bold',
     },
     settingItem: {
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -78,12 +82,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     closeButton: {
-        backgroundColor: '#FF5733',
+        width: '100%',
+        backgroundColor: '#000',
         padding: 10,
-        borderRadius: 5,
-        position: 'absolute',
-        bottom: 50,
-        alignSelf: 'center',
     },
 });
 

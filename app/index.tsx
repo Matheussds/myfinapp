@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Card from "@/components/ui/Card";
 import React, { useEffect, useState } from "react";
@@ -10,12 +10,13 @@ import FooterApp from "@/components/ui/FooterApp";
 import FooterContext from "@/components/ui/FooterContext";
 import HeaderContext from "@/components/ui/HeaderContext";
 import ChooseDisplay from "@/components/ui/ChooseDisplay";
-import MyModal from "@/components/ui/Modal";
-import ModalCategory from "@/components/ui/ModalCategory";
-import ModalExpense from "@/components/ui/ModalExpense";
+import ModalExpense, { Expense } from "@/components/ui/ModalExpense";
 import ModalFull from "@/components/ui/ModalFull";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
+import { getExpenses } from "@/mocks/mockAPI";
+import ButtonCircle from "@/components/ui/ButtonCircle";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 // Proximas  features:
 // Cadastrar o nome dos cartões de crédito
@@ -37,6 +38,7 @@ interface Value {
   value: number;
   description: string;
 }
+
 interface Day {
   date: string;
   maxValue: number;
@@ -50,39 +52,33 @@ type InstallmentsList = {
   description: string;
 }
 
+type ExpenseData = {
+  categoryId: string;
+  category: string;
+  dates: {
+    year: number;
+    month: number;
+    expenseList: DayList[];
+    installments: InstallmentsList[];
+  }[];
+};
+
+
+// Removed duplicate ExpenseData type definition
 
 export default function Index() {
   const router = useRouter();
   const { isAuthenticated, signOut } = useAuth();
   const [loading, setLoading] = useState(true); // Estado de carregamento
   const [openParcelas, setOpenParcelas] = useState(false);
-  const [openModalCategory, setOpenModalCategory] = useState(false);
   const [openModalExpense, setOpenModalExpense] = useState(false);
   const [openModalAppSettings, setOpenModalAppSettings] = useState(false);
-
-  // crie um array de objetos com os valores que podem ter dentreo do valueContainer component
-  // acrsescente também os objetos que não tem todos os valores preenchidos
-  const dayList: DayList[] = [
-    {
-      maxValue: 100.00, date: '14/01', values: [
-        { value: 50.00, description: 'Carregador' },
-        { value: 50.00, description: '' },
-      ]
-    },
-    {
-      maxValue: 100.00, date: '12/01', values: [
-        { value: 100.00, description: 'Fruteira' },
-        { value: 20.50, description: '' },
-        { value: 16.80, description: '' },
-      ]
-    }
-  ]
-
-  const installments: InstallmentsList[] = [
-    { value: 50.00, currentInstallment: 1, totalInstallments: 10, description: 'Carregador' },
-    { value: 50.00, currentInstallment: 1, totalInstallments: 10, description: 'Carregador' },
-    { value: 100.00, currentInstallment: 1, totalInstallments: 10, description: 'Carregador' }
-  ]
+  const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'MONEY'>('CARD');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [expenseData, setExpenseData] = useState<ExpenseData[] | null>(null);
+  const [dayList, setDayList] = useState<DayList[]>([]);
+  const [installments, setInstallments] = useState<InstallmentsList[]>([]);
 
   const exceededLimit = (dayValues: number[], limitValue: number) => {
     const total = dayValues.reduce((acc, value) => acc + value, 0);
@@ -152,16 +148,68 @@ export default function Index() {
 
   const colorBlue = '#052BC2';
 
-  useEffect(() => {
-    // Simular uma verificação inicial, pode ser um fetch de autenticação
-    const checkAuth = async () => {
-      setLoading(false); // Após a verificação, pare o carregamento
-      if (!isAuthenticated) {
-        router.push('/login'); // Redireciona para a tela de login
+  const handlePaymentMethod = (paymentMethod: 'CARD' | 'MONEY') => {
+    setPaymentMethod(paymentMethod);
+    setOpenModalExpense(true);
+  }
+
+  const handleAddExpense = (expense: Expense) => {
+    console.log('Adicionando gasto', expense);
+
+    const newExpenseData = expenseData?.map(expData => {
+      if (expData.categoryId === selectedCategoryId) {
+        const expDate = expData.dates[0].expenseList.find(exp => exp.date === expense.date);
+        if (expDate) {
+          expDate.values.push({
+            value: expense.value,
+            description: expense.description
+          });
+        } else {
+          expData.dates[0].expenseList.push({
+            date: expense.date,
+            maxValue: 1000,
+            values: [{
+              value: expense.value,
+              description: expense.description
+            }]
+          });
+        }
       }
+      return expData;
+    });
+
+    setExpenseData(newExpenseData ?? []);
+  }
+
+  const handleSelectCategory = (category: string) => {
+    setSelectedCategory(category);
+    setSelectedCategoryId(expenseData?.find(expense => expense.category === category)?.categoryId ?? '');
+    setDayList(expenseData?.find(expense => expense.category === category)?.dates[0].expenseList ?? []);
+    setInstallments(expenseData?.find(expense => expense.category === category)?.dates[0].installments ?? []);
+    console.log('Categoria selecionada', category);
+  }
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Simular uma verificação inicial, pode ser um fetch de autenticação
+      const checkAuth = async () => {
+        setLoading(false); // Após a verificação, pare o carregamento
+        console.log('isAuthenticated', isAuthenticated);
+        // if (!isAuthenticated) {
+        //   console.log('Chamou login: ');
+        //   router.push('/login'); // Redireciona para a tela de login
+        // }
+      };
+
+      await checkAuth();
+
+      const expensesAsync = await getExpenses();
+
+      setExpenseData(expensesAsync);
     };
 
-    checkAuth();
+    fetchData();
   }, [isAuthenticated]);
 
   if (loading) {
@@ -176,36 +224,59 @@ export default function Index() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor="#02145C" />
       <HeaderApp onOpenMenu={() => setOpenModalAppSettings(true)} />
-      <HeaderContext onAdd={() => setOpenModalCategory(true)} />
+      <HeaderContext onSelectCategory={handleSelectCategory} />
       <View style={styles.contentContainer}>
         <Card>
-          {!openParcelas ?
+          {!openParcelas ? flattenedData.length ?
             <FlatList
               data={flattenedData}
               renderItem={renderDay}
               keyExtractor={(item) => item.key} // Chave única para cada item
             />
             :
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 6 }}>
+              <Text>Adicione um novo gasto</Text>
+              <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                <MaterialIcons name="touch-app" size={34} color={colorBlue} />
+                <Ionicons name="arrow-redo" size={24} color={colorBlue} />
+                <View style={styles.buttonCircle}>
+                  <Ionicons name="add" size={20} color='#fff' />
+                </View>
+              </View>
+            </View>
+            :
             <React.Fragment>
 
               <View style={styles.installmentsTitle}>
                 <Text style={{ fontSize: 16, color: '#fff' }}>Parcelas</Text>
               </View>
-
-              <FlatList
-                data={flattenedDataInstallments}
-                renderItem={renderInstallments}
-                keyExtractor={(item) => item.key}
-              />
+              {flattenedDataInstallments.length ?
+                <FlatList
+                  data={flattenedDataInstallments}
+                  renderItem={renderInstallments}
+                  keyExtractor={(item) => item.key}
+                />
+                :
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text>Adicione um novo gasto</Text>
+                  <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                    <MaterialIcons name="touch-app" size={34} color={colorBlue} />
+                    <Ionicons name="arrow-redo" size={24} color={colorBlue} />
+                    <View style={styles.buttonCircle}>
+                      <Ionicons name="add" size={20} color='#fff' />
+                    </View>
+                  </View>
+                </View>}
             </React.Fragment>
+
           }
         </Card>
         <ChooseDisplay onSetOpenParcelas={setOpenParcelas} />
       </View>
-      <FooterContext onAdd={() => setOpenModalExpense(true)} />
+      <FooterContext onMethodSelected={handlePaymentMethod} />
       <FooterApp />
-      <ModalCategory modalVisible={openModalCategory} onSetVisible={setOpenModalCategory} />
-      <ModalExpense modalVisible={openModalExpense} onSetVisible={setOpenModalExpense} />
+
+      <ModalExpense modalVisible={openModalExpense} paymentMethod={paymentMethod} onSetVisible={setOpenModalExpense} categoryID={selectedCategoryId} onAddExpense={handleAddExpense} />
       <ModalFull isVisible={openModalAppSettings} onClose={() => setOpenModalAppSettings(false)} />
     </SafeAreaView>
   );
@@ -240,4 +311,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+  buttonCircle: {
+    borderRadius: '100%',
+    padding: 7,
+    backgroundColor: '#052BC2',
+  }
 })
