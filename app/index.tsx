@@ -157,14 +157,18 @@ export default function Index() {
     console.log('Adicionando gasto', expense);
 
     const newExpenseData = expenseData?.map(expData => {
+      console.log(`${selectedCategoryId} === ${expData.categoryId}`);
       if (expData.categoryId === selectedCategoryId) {
+        console.log("Achou categoria: ", expData.category);
         const expDate = expData.dates[0].expenseList.find(exp => exp.date === expense.date);
         if (expDate) {
+          console.log("Achou ano e mes: ", expDate.date);
           expDate.values.push({
             value: expense.value,
             description: expense.description
           });
         } else {
+          console.log("Não achou ano e mes, adicionando novo: ", expense.date);
           expData.dates[0].expenseList.push({
             date: expense.date,
             maxValue: 1000,
@@ -190,27 +194,29 @@ export default function Index() {
   }
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // Simular uma verificação inicial, pode ser um fetch de autenticação
-      const checkAuth = async () => {
-        setLoading(false); // Após a verificação, pare o carregamento
-        console.log('isAuthenticated', isAuthenticated);
-        // if (!isAuthenticated) {
-        //   console.log('Chamou login: ');
-        //   router.push('/login'); // Redireciona para a tela de login
-        // }
-      };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     // Simular uma verificação inicial, pode ser um fetch de autenticação
+  //     // const checkAuth = async () => {
+  //     //   setLoading(false); // Após a verificação, pare o carregamento
+  //     //   console.log('isAuthenticated', isAuthenticated);
+  //     //   if (!isAuthenticated) {
+  //     //     console.log('Chamou login: ');
+  //     //     router.push('/login'); // Redireciona para a tela de login
+  //     //   }
+  //     // };
+  //     //  if (!isAuthenticated) {
+  //     //   console.log('Chamou login: ');
+  //     //   router.push('/login'); // Redireciona para a tela de login
+  //     // }
 
-      await checkAuth();
+  //     const expensesAsync = await getExpenses();
 
-      const expensesAsync = await getExpenses();
+  //     setExpenseData(expensesAsync);
+  //   };
 
-      setExpenseData(expensesAsync);
-    };
-
-    fetchData();
-  }, [isAuthenticated]);
+  //   fetchData();
+  // }, [isAuthenticated]);
 
   if (loading) {
     return (
@@ -222,7 +228,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={"light-content"} backgroundColor="#02145C" />
+      {/* <StatusBar barStyle={"light-content"} backgroundColor="#02145C" />
       <HeaderApp onOpenMenu={() => setOpenModalAppSettings(true)} />
       <HeaderContext onSelectCategory={handleSelectCategory} />
       <View style={styles.contentContainer}>
@@ -277,7 +283,7 @@ export default function Index() {
       <FooterApp />
 
       <ModalExpense modalVisible={openModalExpense} paymentMethod={paymentMethod} onSetVisible={setOpenModalExpense} categoryID={selectedCategoryId} onAddExpense={handleAddExpense} />
-      <ModalFull isVisible={openModalAppSettings} onClose={() => setOpenModalAppSettings(false)} />
+      <ModalFull isVisible={openModalAppSettings} onClose={() => setOpenModalAppSettings(false)} /> */}
     </SafeAreaView>
   );
 }
