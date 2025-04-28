@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import MyModal from "./Modal";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Category } from "entity";
+import { postCategory } from "@api/categories";
 
-export default function ModalCategory(props: { modalVisible: boolean, onSetVisible: (isVisible: boolean) => void, onAddCategory: (category: string) => void }) {
+interface Props {
+    modalVisible: boolean;
+    onSetVisible: (isVisible: boolean) => void;
+    onAddCategory: (category: Category) => void;
+}
+
+export default function ModalCategory(props: Props) {
     const [inputValue, setInputValue] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -11,11 +19,18 @@ export default function ModalCategory(props: { modalVisible: boolean, onSetVisib
         props.onSetVisible(visible);
     }
 
-    const addCategory = () => {
-        console.log('Adicionando categoria', inputValue);
-        props.onAddCategory(inputValue);
-        setInputValue('');
-        onSetModalVisible(false);
+    const addCategory = async () => {
+        try {
+            let category: Category = {
+                name: inputValue
+            }
+            category = await postCategory(category);
+            props.onAddCategory(category);
+            setInputValue('');
+            onSetModalVisible(false);
+        } catch (error) {
+            console.error("Error adding category:", error);
+        }
     }
 
     useEffect(() => {

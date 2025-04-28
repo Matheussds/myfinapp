@@ -9,13 +9,11 @@ const ModalFull = (props: { isVisible: boolean, onClose: () => void }) => {
 
     const handleModalClose = () => {
         setModalVisible(false);
-        console.log("ModalFull handleModalClose");
         props.onClose();
     }
 
     useEffect(() => {
         setModalVisible(props.isVisible);
-        console.log('ModalFull isVisible', props.isVisible);
     }, [props.isVisible]);
 
     return (

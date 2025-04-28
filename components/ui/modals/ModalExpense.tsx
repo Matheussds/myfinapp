@@ -1,23 +1,34 @@
 import { useEffect, useState } from "react";
 import MyModal from "./Modal";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import ColorPicker from "./ColorPicker";
-import { postMoneyExpense } from "@/mocks/mockAPI";
+import ColorPicker from "../ColorPicker";
+import { postMoneyExpense } from "@mocks/mockAPI";
+import { Expense, Card, PaymentMethod } from "entity";
+import { getCards } from "@api/cards";
 
-export type Expense = {
-    date: string;
-    year: number;
-    month: number;
-    value: number;
-    description: string;
+/*
+PaymentMethodId:
+    1 - Money
+    2 - PIX
+    3 - Credit Card
+    4 - Debit Card
+*/
+
+interface Props {
+    modalVisible: boolean;
+    paymentMethod: PaymentMethod;
+    monthYear: string;
+    onSetVisible: (isVisible: boolean) => void;
+    categoryGUID: string;
+    onAddExpense: (expense: Expense, day: number) => void;
 }
 
-export default function ModalExpense(props: { modalVisible: boolean, paymentMethod: 'CARD' | 'MONEY', onSetVisible: (isVisible: boolean) => void, categoryID: string, onAddExpense: (expense: Expense) => void }) {
+export default function ModalExpense(props: Props) {
     const [inputCardDescription, setInputCardDescription] = useState('');
     const [inputExpenseValue, setInputExpenseValue] = useState('');
     const [inputExpenseDescription, setInputExpenseDescription] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
-    const [cards, setCards] = useState<{ name: string }[]>([]);
+    const [cards, setCards] = useState<Card[]>([]);
     const [selectedCard, setSelectedCard] = useState<number | null>(null);
 
     const onSetModalVisible = (visible: boolean) => {
@@ -30,17 +41,23 @@ export default function ModalExpense(props: { modalVisible: boolean, paymentMeth
             const id = await postMoneyExpense({
                 value: parseFloat(inputExpenseValue),
                 description: inputExpenseDescription
-            }, 2025, 3, props.categoryID);
+            }, 2025, 3, props.categoryGUID);
 
             const expense: Expense = {
-                date: "04/03",
-                year: 2025,
-                month: 3,
+                categoryGuid: props.categoryGUID,
+                guid: id,
+                paymentMethodId: props.paymentMethod,
+                spentAt: new Date(),
+                isRecurring: false,
+                installments: 1,
+                installmentNumber: 1,
                 value: parseFloat(inputExpenseValue),
-                description: inputExpenseDescription
+                description: inputExpenseDescription,
+                cardGuid: selectedCard !== null ? cards[selectedCard].guid : undefined,
             }
 
-            props.onAddExpense(expense);
+            const day = new Date().getDate();
+            props.onAddExpense(expense, day);
 
             setInputExpenseValue('');
             setInputExpenseDescription('');
@@ -50,14 +67,24 @@ export default function ModalExpense(props: { modalVisible: boolean, paymentMeth
         }
     }
 
+    const loadCards = async () => {
+        try {
+            const cards = await getCards();
+            setCards(cards);
+        } catch (error) {
+            
+        }
+    }
+
     useEffect(() => {
+        loadCards();
         setModalVisible(props.modalVisible);
     }, [props.modalVisible]);
 
     const colorBlue = '#052BC2';
     return (
         <MyModal modalVisible={modalVisible}>
-            {props.paymentMethod === 'CARD' && cards.length == 0 ? (
+            {[3, 4].includes(props.paymentMethod) && cards.length == 0 ? (
                 <View style={{ width: '100%', alignItems: "center", padding: 20 }}>
                     <Text style={styles.modalText}>Adicionar um novo cartão</Text>
                     <TextInput
@@ -68,7 +95,7 @@ export default function ModalExpense(props: { modalVisible: boolean, paymentMeth
                     />
                     <ColorPicker />
                 </View>
-            ) : props.paymentMethod === "CARD" && (
+            ) : [3, 4].includes(props.paymentMethod) && (
                 <View style={{ width: '100%', alignItems: "center", padding: 20 }}>
                     <Text style={styles.modalText}>Selecione o cartão</Text>
                     {cards.map((card, index) => (
@@ -83,7 +110,7 @@ export default function ModalExpense(props: { modalVisible: boolean, paymentMeth
                 </View>
             )}
 
-            {(props.paymentMethod === "MONEY" || (props.paymentMethod === 'CARD' && selectedCard)) && (
+            {([1, 2].includes(props.paymentMethod) || ([3, 4].includes(props.paymentMethod) && selectedCard)) && (
                 <View style={{ width: '100%', alignItems: "center", padding: 20 }}>
                     <Text style={styles.modalText}>Adicionar um novo gasto</Text>
                     <TextInput
