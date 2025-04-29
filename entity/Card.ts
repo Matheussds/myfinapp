@@ -1,7 +1,7 @@
 export type Card = {
     guid: string;
     name: string;
-    paymentMethodId: number;
-    closingDay?: number;
-    dueDay?: number;
+    payment_method_id: number;
+    closing_day?: number;
+    due_day?: number;
 }

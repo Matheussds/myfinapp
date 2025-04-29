@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function ChooseDisplay({onSetOpenParcelas} : {onSetOpenParcelas: (open: boolean) => void}) {
-    const [openParcelas, setOpenParcelas] = useState(false);
+interface Props {
+    onSetOpenParcelas: (open: boolean) => void;
+    isOpenParcelas: boolean;
+}
+
+export default function ChooseDisplay({onSetOpenParcelas, isOpenParcelas} : Props) {
+    const [openParcelas, setOpenParcelas] = useState(isOpenParcelas);
     const colorBlue = '#052BC2';
 
     const onSetOpen = (open: boolean) => {

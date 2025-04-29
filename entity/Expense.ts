@@ -3,10 +3,10 @@ export type Expense = {
     description: string;
     value: number;
     spentAt: Date;
-    categoryGuid: string;
-    paymentMethodId: number;
-    cardGuid?: string;
-    isRecurring: boolean;
+    category_guid: string;
+    payment_method_id: number;
+    card_guid?: string;
+    is_recurring: boolean;
     installments?: number;
-    installmentNumber?: number;
+    installment_number?: number;
 }

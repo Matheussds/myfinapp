@@ -62,7 +62,6 @@ export default function Index() {
 
   // Função para renderizar cada dia e seus valores
   const renderDay = ({ item }: { item: DayList }) => {
-
     return (
       <React.Fragment key={generateKey()}>
         <RowDate
@@ -174,7 +173,7 @@ export default function Index() {
     setInstallmentsMonth(expensesMonthYear.installments.map(installment => ({
       guid: installment.guid,
       value: installment.value,
-      currentInstallment: installment.installmentNumber ?? 0,
+      currentInstallment: installment.installment_number ?? 0,
       totalInstallments: installment.installments ?? 0,
       description: installment.description,
     })));
@@ -270,7 +269,7 @@ export default function Index() {
               </React.Fragment>
           }
         </Card>
-        <ChooseDisplay onSetOpenParcelas={setOpenParcelas} />
+        <ChooseDisplay onSetOpenParcelas={setOpenParcelas} isOpenParcelas={openParcelas}/>
       </View>
       <FooterContext onMethodSelected={handlePaymentMethod} />
       <FooterApp onDateChange={setMonthYearOfExpenses} />
