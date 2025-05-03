@@ -185,7 +185,7 @@ export default function Index() {
     setInstallmentsMonth([]);
     setSelectedCategoryGUID(guid);
     const category = expensesData?.find(exp => exp.category_guid === guid);
-    console.log("category length: " + category?.expenses_month_year.length);
+    console.log("category month length: " + category?.expenses_month_year.length);
     if (!category) return;
 
     console.log("data de despesas: " + monthYearOfExpenses);

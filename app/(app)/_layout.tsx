@@ -1,5 +1,5 @@
 import { Stack, Redirect } from 'expo-router';
-import { useAuth } from '../../context/ctx';
+import { useAuth } from '../../context/AuthContext';
 import LoadingScreen from '@components/ui/LoadingScreen';
 
 export default function AppLayout() {

@@ -5,7 +5,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
-import { useAuth } from '../../context/ctx';
+import { useAuth } from '../../context/AuthContext';
 import { UserCredentialsDTO } from '@api/DTOs/credentionsDTO';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;

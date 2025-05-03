@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MyModal from "./Modal";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ColorPicker from "../ColorPicker";
 import { postMoneyExpense } from "@mocks/mockAPI";
 import { Expense, Card, PaymentMethod } from "entity";
@@ -29,10 +29,11 @@ export default function ModalExpense(props: Props) {
     const [inputExpenseDescription, setInputExpenseDescription] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [cards, setCards] = useState<Card[]>([]);
-    const [selectedCard, setSelectedCard] = useState<number | null>(null);
+    const [selectedCard, setSelectedCard] = useState<number>(-1);
 
     const onSetModalVisible = (visible: boolean) => {
         setModalVisible(visible);
+        setSelectedCard(-1);
         props.onSetVisible(visible);
     }
 
@@ -44,21 +45,23 @@ export default function ModalExpense(props: Props) {
             }, 2025, 3, props.categoryGUID);
 
             const expense: Expense = {
-                categoryGuid: props.categoryGUID,
+                category_guid: props.categoryGUID,
                 guid: id,
-                paymentMethodId: props.paymentMethod,
+                payment_method_id: props.paymentMethod,
                 spentAt: new Date(),
-                isRecurring: false,
+                is_recurring: false,
                 installments: 1,
-                installmentNumber: 1,
+                installment_number: 1,
                 value: parseFloat(inputExpenseValue),
                 description: inputExpenseDescription,
-                cardGuid: selectedCard !== null ? cards[selectedCard].guid : undefined,
+                card_guid: selectedCard !== null ? cards[selectedCard].guid : undefined,
             }
 
             const day = new Date().getDate();
             props.onAddExpense(expense, day);
 
+            setInputCardDescription('');
+            selectedCard !== null && setSelectedCard(-1);
             setInputExpenseValue('');
             setInputExpenseDescription('');
             onSetModalVisible(false);
@@ -72,8 +75,14 @@ export default function ModalExpense(props: Props) {
             const cards = await getCards();
             setCards(cards);
         } catch (error) {
-            
+            console.error("Error loading cards:", error);
         }
+    }
+
+    const onSetCard = (index: number) => {
+        setSelectedCard(index);
+        const card = cards[index];
+        console.log(card);
     }
 
     useEffect(() => {
@@ -81,7 +90,7 @@ export default function ModalExpense(props: Props) {
         setModalVisible(props.modalVisible);
     }, [props.modalVisible]);
 
-    const colorBlue = '#052BC2';
+    // const colorBlue = '#052BC2';
     return (
         <MyModal modalVisible={modalVisible}>
             {[3, 4].includes(props.paymentMethod) && cards.length == 0 ? (
@@ -98,19 +107,30 @@ export default function ModalExpense(props: Props) {
             ) : [3, 4].includes(props.paymentMethod) && (
                 <View style={{ width: '100%', alignItems: "center", padding: 20 }}>
                     <Text style={styles.modalText}>Selecione o cartão</Text>
-                    {cards.map((card, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={[styles.button, { backgroundColor: selectedCard === index ? colorBlue : '#ccc' }]}
-                            onPress={() => setSelectedCard(index)}
-                        >
-                            <Text style={styles.buttonText}>{card.name}</Text>
-                        </TouchableOpacity>
-                    ))}
+                    <FlatList
+                        data={cards}
+                        keyExtractor={(item) => item.guid}
+                        renderItem={({ item, index }) => (
+                            <TouchableOpacity
+                                key={item.guid}
+                                style={[styles.button, styles.cardButton, selectedCard === index ? styles.cardSelected : styles.card]}
+                                onPress={() => onSetCard(index)}
+                            >
+                                <Text style={styles.buttonText}>
+                                    {typeof item.name === "string" && item.name.trim() !== ""
+                                        ? item.name
+                                        : `Cartão ${index + 1}`}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ paddingHorizontal: 20, gap: 10, alignItems: 'center' }}
+                    />
                 </View>
             )}
 
-            {([1, 2].includes(props.paymentMethod) || ([3, 4].includes(props.paymentMethod) && selectedCard)) && (
+            {([1, 2].includes(props.paymentMethod) || ([3, 4].includes(props.paymentMethod) && selectedCard >= 0)) && (
                 <View style={{ width: '100%', alignItems: "center", padding: 20 }}>
                     <Text style={styles.modalText}>Adicionar um novo gasto</Text>
                     <TextInput
@@ -128,21 +148,20 @@ export default function ModalExpense(props: Props) {
                 </View>
             )}
 
-            <View style={{ flexDirection: 'row', width: '100%', borderTopWidth: 1, borderTopColor: '#ccc' }}>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
                 <TouchableOpacity
-                    style={styles.button}
+                    style={[styles.button, styles.buttonCancel]}
                     onPress={() => onSetModalVisible(false)}
                 >
-                    <Text style={[styles.buttonText, { color: '#da330d' }]}>Cancelar</Text>
+                    <Text style={styles.buttonText}>Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: colorBlue, borderTopStartRadius: 50, borderBottomStartRadius: 50 }]}
+                    style={[styles.button, styles.buttonAdd]}
                     onPress={() => handleAddExpense()}
                 >
                     <Text style={styles.buttonText}>Adicionar</Text>
                 </TouchableOpacity>
             </View>
-
         </MyModal>
     )
 }
@@ -161,6 +180,36 @@ const styles = StyleSheet.create({
     button: {
         width: '50%',
         padding: 10,
+    },
+    cardButton: {
+        justifyContent: 'center',
+        padding: 10,
+        backgroundColor: '#ccc',
+        borderRadius: 5,
+    },
+    buttonCancel: {
+        backgroundColor: '#da330d',
+        borderRightWidth: 1,
+        borderRightColor: '#ccc',
+        borderTopEndRadius: 20,
+    },
+    buttonAdd: {
+        backgroundColor: '#000',
+        borderLeftWidth: 1,
+        borderLeftColor: '#ccc',
+        borderTopStartRadius: 20,
+    },
+    card: {
+        width: 120,
+        height: 70,
+        backgroundColor: '#820AD1'
+    },
+    cardSelected: {
+        width: 130,
+        height: 80,
+        backgroundColor: '#052BC2',
+        borderColor: '#052BC2',
+        borderWidth: 2
     },
     input: {
         height: 50,

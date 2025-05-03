@@ -1,4 +1,4 @@
-import { useAuth } from '../../context/ctx';
+import { useAuth } from '../../context/AuthContext';
 import { UserDTO } from '@/entity/User';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';

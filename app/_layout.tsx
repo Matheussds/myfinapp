@@ -1,5 +1,5 @@
 import { Slot, Redirect } from 'expo-router';
-import { AuthProvider, useAuth } from '../context/ctx';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import LoadingScreen from '@components/ui/LoadingScreen';
 
 export default function RootLayout() {
