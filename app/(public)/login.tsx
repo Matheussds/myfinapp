@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Button } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+import AuthContext from '../../context/AuthContext';
 import { UserCredentialsDTO } from '@api/DTOs/credentionsDTO';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -13,10 +13,10 @@ const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 WebBrowser.maybeCompleteAuthSession();
 
 const Login: React.FC = () => {
-    const { login } = useAuth();
+    const { signIn } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [userInfo, setUserInfo] = useState(null);
+    // const [userInfo, setUserInfo] = useState(null);
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
         clientId: '1000500310954-b0b5dqdbn3665jsapn3pim3s3ehubs1l.apps.googleusercontent.com',
         redirectUri: 'https://auth.expo.io/@matheussds/myfin',
@@ -64,7 +64,13 @@ const Login: React.FC = () => {
             //o response.data deve ser do tipo UserDTO
             const response: { data: UserCredentialsDTO }= await axios.post(apiUrl + '/api/users/auth/login', { email, password });
             const { token, user } = response.data;
-            await login(token, user.guid, user); // Chama a função para marcar como autenticado
+
+            if (!user.guid) {
+                Alert.alert("Usuário sem identificador único")
+                return
+            }
+
+            await signIn(token, user.guid, user); // Chama a função para marcar como autenticado
             router.replace('/'); // Redireciona para a tela inicial após o login
         } catch (error) {
             console.error('Erro ao fazer login:', error);

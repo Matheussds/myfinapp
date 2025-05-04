@@ -1,9 +1,20 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
-const MyModal = (props: { modalVisible: boolean, children: ReactNode}) => {
+interface Props {
+    modalVisible: boolean;
+    children: ReactNode;
+    onClose: () => void;
+}
+
+const MyModal = (props: Props) => {
     const [modalVisible, setModalVisible] = useState(false);
    
+    const handleCloseModal = () => {
+        setModalVisible(false);
+        props.onClose();
+    }
+
     useEffect(() => {
         setModalVisible(props.modalVisible);
     }, [props.modalVisible]);
@@ -13,7 +24,7 @@ const MyModal = (props: { modalVisible: boolean, children: ReactNode}) => {
             animationType="slide"
             transparent={true}
             visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}
+            onRequestClose={handleCloseModal}
         >
             <View style={styles.modalOverlay}>
                 <View style={styles.modalView}>

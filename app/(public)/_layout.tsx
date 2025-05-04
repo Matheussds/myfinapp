@@ -1,18 +1,17 @@
 // import { Stack, Redirect } from 'expo-router';
 // import { useAuth } from '../../context/AuthContext';
-// import LoadingScreen from '@components/ui/LoadingScreen';
 
 import { Stack, useRouter } from 'expo-router';
 import { useContext, useEffect } from 'react';
 import AuthContext from '../../context/AuthContext';
 
-export default function AuthLayout() {
-  const { loading, signed } = useContext(AuthContext);
+export default function PublicLayout() {
+  const { signed, loading } = useContext(AuthContext);
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !signed) {
-      router.replace('/login');
+    if (!loading && signed) {
+      router.replace('/home');
     }
   }, [signed, loading]);
 
@@ -23,17 +22,12 @@ export default function AuthLayout() {
   return <Stack screenOptions={{ headerShown: false }} />;
 }
 
-// export default function AppLayout() {
-//   const { isAuthenticated, loading } = useAuth();
+// export default function AuthLayout() {
+//   const { isAuthenticated } = useAuth();
 
-//   if (loading) {
-//     console.log("Loading app")
-//     return <LoadingScreen />;
-//   }
-
-//   if (!isAuthenticated) {
-//     console.log("Indo para login")
-//     return <Redirect href="/login" />;
+//   if (isAuthenticated) {
+//     console.log("Autenticado")
+//     return <Redirect href="/" />;
 //   }
 
 //   return <Stack screenOptions={{ headerShown: false }}/>;

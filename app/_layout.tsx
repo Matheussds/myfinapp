@@ -1,21 +1,32 @@
-import { Slot, Redirect } from 'expo-router';
-import { AuthProvider, useAuth } from '../context/AuthContext';
-import LoadingScreen from '@components/ui/LoadingScreen';
+import { Stack } from 'expo-router';
+import { AuthProvider } from '../context/AuthContext';
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <AuthLayout />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* As rotas filhas serão renderizadas automaticamente */}
+      </Stack>
     </AuthProvider>
   );
 }
 
-function AuthLayout() {
-  const { isAuthenticated, loading } = useAuth();
+// export default function RootLayout() {
+//   return (
+//     <AuthProvider>
+//       <AuthLayout />
+//     </AuthProvider>
+//   );
+// }
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+// function AuthLayout() {
+//   const { loading } = useAuth();
 
-  return <Slot screenOptions={{ headerShown: false }}/>;
-}
+//   if (loading) {
+//     console.log("Loading raiz")
+//     return <LoadingScreen />;
+//   }
+
+//   //Talvez o uso de slot não seja mais util
+//   return <Slot screenOptions={{ headerShown: false }}/>;
+// }

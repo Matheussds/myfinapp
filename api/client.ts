@@ -1,11 +1,12 @@
-import axios, { AxiosInstance } from 'axios';
+// import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
+import axios from 'axios';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 // Crie uma instância do Axios
-const api: AxiosInstance = axios.create({
+const api = axios.create({
     baseURL: apiUrl, // Ex.: https://api.exemplo.com
     timeout: 10000,
 });

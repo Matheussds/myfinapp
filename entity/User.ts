@@ -1,7 +1,8 @@
 type User = {
-    guid: string;
+    guid?: string | null;
     name: string;
     email: string;
+    password?: string | null;
 }
 
 export { User };

@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
 const colors: string[] = [
     '#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#8E44AD', '#E74C3C',
     '#3498DB', '#2ECC71', '#9B59B6', '#E67E22', '#1ABC9C', '#34495E'
 ];
 
-const ColorPicker: React.FC = () => {
+interface Props {
+    onSelectColor: (color: string) => void;
+}
+
+export default function ColorPicker({ onSelectColor }: Props) {
     // const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [selectedColor, setSelectedColor] = useState<string>('#FFFFFF');
 
     const handleColorSelect = (color: string) => {
         setSelectedColor(color);
+        onSelectColor(color);
         // setModalVisible(false);
     };
 
@@ -58,5 +63,3 @@ const styles = StyleSheet.create({
         // borderColor: '#fff'
     }
 });
-
-export default ColorPicker;

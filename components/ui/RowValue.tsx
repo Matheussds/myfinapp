@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, DimensionValue } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
 type Props = {
     value: number;

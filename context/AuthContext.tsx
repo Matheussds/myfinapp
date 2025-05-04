@@ -1,21 +1,29 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { User } from '@entity';
 import api from '@api/client';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
+interface AuthContextData {
+  signed: boolean;
   token: string | null;
   user: User | null;
   userGUID: string | null;
-  login: (token: string, userGUID: string, user: User ) => Promise<void>;
-  logout: () => Promise<void>;
+  signIn: (token: string, userGUID: string, user: User ) => Promise<void>;
+  signOut: () => Promise<void>;
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthContextData2 {
+  signed: boolean;
+  user: object | null;
+  loading: boolean;
+  signIn: (credentials: { email: string; password: string }) => Promise<void>;
+  signOut: () => Promise<void>;
+}
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -24,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const checkToken = async () => {
+      console.log("Check")
       try {
         const savedToken = await SecureStore.getItemAsync('authToken');
         if (savedToken) {
@@ -40,9 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
     checkToken();
+    console.log("Out check")
   }, []);
 
-  const login = async (newToken: string, userGUID: string, user: User) => {
+  const signIn = async (newToken: string, userGUID: string, user: User) => {
+    console.log("Login context")
     await SecureStore.setItemAsync('authToken', newToken);
     await SecureStore.setItemAsync('authUser', JSON.stringify(user));
     await SecureStore.setItemAsync('authUserGUID', userGUID);
@@ -52,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
   };
 
-  const logout = async () => {
+  const signOut = async () => {
     await SecureStore.deleteItemAsync('authToken');
     await SecureStore.deleteItemAsync('authUser');
     await SecureStore.deleteItemAsync('authUserGUID');
@@ -63,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, user, userGUID, login, logout, loading }}>
+    <AuthContext.Provider value={{ signed: isAuthenticated, token, user, userGUID, signIn, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -76,3 +87,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthContext;

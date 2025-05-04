@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, View, SafeAreaView } from "react-native";
 import { Card, ChooseDisplay, RowValue, RowSeparator, RowDate } from "@ui";
 import { HeaderApp, FooterApp } from "@ui/layoutMain";
 import { FooterContext, HeaderContext } from "@ui/home";
@@ -41,7 +40,7 @@ type InstallmentsList = {
   description: string;
 }
 
-export default function Index() {
+export default function Home() {
   const [loading, setLoading] = useState(true); // Estado de carregamento
   const [openParcelas, setOpenParcelas] = useState(false);
   const [openModalExpense, setOpenModalExpense] = useState(false);
@@ -200,8 +199,10 @@ export default function Index() {
 
   const loadExpenses = async () => {
     try {
+      console.log("load expenses")
       const expensesApi = await getExpenses();
       setExpensesData(expensesApi);
+      console.log("Expenses carregadas")
     } catch (error) {
       console.error("Erro ao buscar despesas:", error);
     }
@@ -213,10 +214,12 @@ export default function Index() {
 
 
   useEffect(() => {
+    console.log("Entrada index")
     setLoading(true); // Inicia o carregamento
     const initialize = async () => {
       await loadExpenses(); // Busca os dados apenas se autenticado
       setLoading(false); // Para o carregamento
+      console.log("loading false")
     };
 
     initialize();
@@ -269,13 +272,20 @@ export default function Index() {
               </React.Fragment>
           }
         </Card>
-        <ChooseDisplay onSetOpenParcelas={setOpenParcelas} isOpenParcelas={openParcelas}/>
+        <ChooseDisplay onSetOpenParcelas={setOpenParcelas} isOpenParcelas={openParcelas} />
       </View>
       <FooterContext onMethodSelected={handlePaymentMethod} />
       <FooterApp onDateChange={setMonthYearOfExpenses} />
       {
         selectedCategoryGUID &&
-        <ModalExpense modalVisible={openModalExpense} monthYear={monthYearOfExpenses} paymentMethod={paymentMethod} onSetVisible={setOpenModalExpense} categoryGUID={selectedCategoryGUID} onAddExpense={handleAddExpense} />
+        <ModalExpense
+          modalVisible={openModalExpense}
+          monthYear={monthYearOfExpenses}
+          paymentMethod={paymentMethod}
+          categoryGUID={selectedCategoryGUID}
+          onClose={() => setOpenModalExpense(false)}
+          onAddExpense={handleAddExpense}
+        />
       }
       <ModalFull isVisible={openModalAppSettings} onClose={() => setOpenModalAppSettings(false)} />
     </SafeAreaView>

@@ -1,8 +1,8 @@
-import { useAuth } from '../../context/AuthContext';
-import { UserDTO } from '@/entity/User';
+import AuthContext from '../../context/AuthContext';
+import { User } from '@entity';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Alert, TouchableOpacity } from 'react-native';
 import { z } from 'zod';
 import { fetch } from 'expo/fetch';
 
@@ -23,7 +23,7 @@ const SignUp: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { signIn } = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -39,12 +39,13 @@ const SignUp: React.FC = () => {
       userSchema.parse({ username, email, password });
       // Se a validação passar, você pode prosseguir com o cadastro
 
-      const user: UserDTO = {
+      const user: User = {
         name: username,
         email,
         password,
       };
 
+      //TODO usar a instancia do axios
       const response = await fetch('https://rnczk-2804-7f74-bdb-a400-599d-342d-2d9a-e359.a.free.pinggy.link/api/users', {
         method: 'POST',
         headers: {
@@ -62,7 +63,7 @@ const SignUp: React.FC = () => {
 
       Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
 
-      login(json.token); // Chama a função para marcar como autenticado
+     signIn(json.token, json.user.guid, json.user); // Chama a função para marcar como autenticado
       
       router.push('/'); // Redireciona para a tela inicial após o login
 
