@@ -27,12 +27,10 @@ const styles = StyleSheet.create({
     },
     cardContent: {
         flex: 1,
-        justifyContent: 'center',
-        width: '100%'
+        justifyContent: 'center'
     },
     valueContainer: {
         flexDirection: 'row',
-        width: '100%',
         minHeight: 50,
         justifyContent: "space-between",
         alignItems: 'center',

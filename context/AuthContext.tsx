@@ -13,14 +13,6 @@ interface AuthContextData {
   loading: boolean;
 }
 
-interface AuthContextData2 {
-  signed: boolean;
-  user: object | null;
-  loading: boolean;
-  signIn: (credentials: { email: string; password: string }) => Promise<void>;
-  signOut: () => Promise<void>;
-}
-
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

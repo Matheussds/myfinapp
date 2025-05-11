@@ -11,7 +11,8 @@ import { Expense } from "entity/Expense";
 import { DayExpenses, ExpenseDTO, ExpensesMonthYear } from "@api/DTOs/expenseDTO";
 import { postExpense } from "@api/expenses";
 import { formatDateToMonthYear } from "@utils/DateFormatter";
-import { PaymentMethod } from "entity";
+import { Limit, PaymentMethod } from "entity";
+import { getLimits } from "@api/limits";
 
 // Proximas  features:
 // Cadastrar o nome dos cartões de crédito
@@ -21,7 +22,7 @@ import { PaymentMethod } from "entity";
 // Quando for expandir a rowValue mostrar todos os detalhes do gasto
 
 type DayList = {
-  maxValue: number;
+  totalDay: number;
   date: string;
   expenses: Expense[]
 }
@@ -45,17 +46,18 @@ export default function Home() {
   const [openParcelas, setOpenParcelas] = useState(false);
   const [openModalExpense, setOpenModalExpense] = useState(false);
   const [openModalAppSettings, setOpenModalAppSettings] = useState(false);
+
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.Credit);
   const [selectedCategoryGUID, setSelectedCategoryGUID] = useState<string | null>(null);
+  const [limitsData, setLimitsData] = useState<Limit>({
+    daily_limit: 0, monthly_limit: 0
+  });
   const [expensesData, setExpensesData] = useState<ExpenseDTO[] | null>(null);
   const [daysList, setDaysList] = useState<DayList[]>([]);
   const [installmentsMonth, setInstallmentsMonth] = useState<InstallmentsList[]>([]);
   const [monthYearOfExpenses, setMonthYearOfExpenses] = useState<string>(formatDateToMonthYear(new Date()));
-
-  const exceededLimit = (dayValues: number[], limitValue: number) => {
-    const total = dayValues.reduce((acc, value) => acc + value, 0);
-    return total > limitValue;
-  }
+  const [spentInTheMounth, setSpentInTheMounth] = useState<number>(0);
+  const [monthTotal, setMonthTotal] = useState<number>(0);
 
   const generateKey = () => Math.random().toString(36).slice(2, 11);
 
@@ -64,9 +66,10 @@ export default function Home() {
     return (
       <React.Fragment key={generateKey()}>
         <RowDate
-          value={item.maxValue}
+          value={item.totalDay}
+          month={monthYearOfExpenses}
           date={item.date}
-          color={exceededLimit(item.expenses.map(value => value.value), item.maxValue) ? "red" : "green"}
+          color={item.totalDay > limitsData.daily_limit ? "red" : "green"}
         />
         {item.expenses.map((value, index) => (
           <React.Fragment key={value.guid}>
@@ -161,7 +164,7 @@ export default function Home() {
     setDaysList([]);
 
     setDaysList(expensesMonthYear.day_expenses.map(day_expense => ({
-      maxValue: day_expense.expenses.reduce((acc, exp) => acc + exp.value, 0),
+      totalDay: day_expense.expenses.reduce((acc, exp) => acc + exp.value, 0),
       date: day_expense.day,
       expenses: day_expense.expenses
     })));
@@ -182,6 +185,7 @@ export default function Home() {
     console.log("handleSelectCategory: " + guid);
     setDaysList([]);
     setInstallmentsMonth([]);
+    setSpentInTheMounth(0);
     setSelectedCategoryGUID(guid);
     const category = expensesData?.find(exp => exp.category_guid === guid);
     console.log("category month length: " + category?.expenses_month_year.length);
@@ -193,8 +197,18 @@ export default function Home() {
     if (!expensesMonthYear) return;
 
     console.log("Gastos do mês: " + expensesMonthYear.day_expenses.length);
+    setSpentInTheMounth(expensesMonthYear.total_value);
     handleDaysList(expensesMonthYear);
     handleInstallmentsMonth(expensesMonthYear);
+  }
+
+  const loadLimits = async () => {
+    try {
+      const limitsApi = await getLimits();
+      setLimitsData(limitsApi);
+    } catch (error) {
+      console.error("Erro ao buscar os limites");
+    }
   }
 
   const loadExpenses = async () => {
@@ -208,15 +222,41 @@ export default function Home() {
     }
   };
 
+  const getMonthTotal = () => {
+    if (expensesData) {
+      console.log("Expenses do mês");
+      const expensesMonthYear: ExpensesMonthYear[] = [];
+      expensesData.forEach(expens => {
+        const expensesMonth = expens.expenses_month_year.find(emy => emy.month_year === monthYearOfExpenses)
+        if (expensesMonth) {
+          expensesMonthYear.push(expensesMonth);
+        }
+      });
+
+      if (expensesMonthYear) {
+        const monthTotal = expensesMonthYear.reduce((acc, exp) => acc + exp.total_value, 0);
+        console.log(monthTotal);
+        return setMonthTotal(monthTotal);
+      }
+    }
+
+    setMonthTotal(0);
+  }
+
   useEffect(() => {
     handleSelectCategory(selectedCategoryGUID ?? '');
   }, [selectedCategoryGUID, monthYearOfExpenses]); // Adiciona selectedCategoryGUID e dateOfExpenses como dependências
 
 
   useEffect(() => {
+    getMonthTotal();
+  }, [monthYearOfExpenses])
+
+  useEffect(() => {
     console.log("Entrada index")
     setLoading(true); // Inicia o carregamento
     const initialize = async () => {
+      await loadLimits();
       await loadExpenses(); // Busca os dados apenas se autenticado
       setLoading(false); // Para o carregamento
       console.log("loading false")
@@ -235,8 +275,8 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={"light-content"} backgroundColor="#02145C" />
-      <HeaderApp onOpenMenu={() => setOpenModalAppSettings(true)} />
+      <StatusBar barStyle={"light-content"} backgroundColor="#052BC2" />
+      <HeaderApp limits={limitsData} onOpenMenu={() => setOpenModalAppSettings(true)} monthTotal={monthTotal} />
       <HeaderContext onSelectCategory={setSelectedCategoryGUID} />
       <View style={styles.contentContainer}>
         <Card>
@@ -260,7 +300,7 @@ export default function Home() {
               <FlatList
                 data={daysList}
                 renderItem={renderDay}
-                keyExtractor={(item) => item.date + item.maxValue.toString() + generateKey()}
+                keyExtractor={(item) => item.date + item.totalDay.toString() + generateKey()}
               // Ensure each item has a unique 'key' property
               />
               :
@@ -274,7 +314,7 @@ export default function Home() {
         </Card>
         <ChooseDisplay onSetOpenParcelas={setOpenParcelas} isOpenParcelas={openParcelas} />
       </View>
-      <FooterContext onMethodSelected={handlePaymentMethod} />
+      <FooterContext onMethodSelected={handlePaymentMethod} totalAmount={spentInTheMounth} />
       <FooterApp onDateChange={setMonthYearOfExpenses} />
       {
         selectedCategoryGUID &&
@@ -307,7 +347,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: '100%',
     justifyContent: 'space-between',
     paddingHorizontal: 8,
     gap: 8

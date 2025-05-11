@@ -1,7 +1,7 @@
 // import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -32,7 +32,10 @@ api.interceptors.request.use(
 
         if (config.url!.startsWith('/api/users/')) {
             if (!userGuid) {
-                throw new Error('userGuid não encontrado no interceptor de requisição');
+                SecureStore.deleteItemAsync('authToken');
+                SecureStore.deleteItemAsync('authUser');
+                SecureStore.deleteItemAsync('authUserGUID');
+                router.replace('/login'); // Redireciona para login
             }
             config.url = config.url?.replace('/users/', `/users/${userGuid}/`);
         }
@@ -44,26 +47,38 @@ api.interceptors.request.use(
 
 // Interceptor de resposta: Trata erros 401
 api.interceptors.response.use(
-    (response) => {
+    async (response) => {
+        console.log("Resp")
+        // console.log(response);
         if (response.status === 401) {
             // Token inválido ou expirado
-            SecureStore.deleteItemAsync('authToken');
-            SecureStore.deleteItemAsync('authUser');
-            SecureStore.deleteItemAsync('authUserGUID');
+            await resetStorage();
             router.replace('/login'); // Redireciona para login
         }
         return response;
     },
     async (error) => {
+        console.log("Error");
+        console.log(error);
+
+        if (isAxiosError(error) && error.response?.status !== 401) {
+            return router.replace('/error');
+        }
+
         if (error.response?.status === 401) {
+            console.log("Error 401");
             // Token inválido ou expirado
-            await SecureStore.deleteItemAsync('authToken');
-            await SecureStore.deleteItemAsync('authUser');
-            await SecureStore.deleteItemAsync('authUserGUID');
-            router.replace('/login'); // Redireciona para login
+            await resetStorage();
+            return router.replace('/login'); // Redireciona para login
         }
         return Promise.reject(error);
     }
 );
+
+const resetStorage = async () => {
+    await SecureStore.deleteItemAsync('authToken');
+    await SecureStore.deleteItemAsync('authUser');
+    await SecureStore.deleteItemAsync('authUserGUID');
+}
 
 export default api;

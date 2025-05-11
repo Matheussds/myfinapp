@@ -30,7 +30,10 @@ export default function HeaderContext({ onSelectCategory }: Props) {
         try {
             setIsLoading(true);
             const storedCategory = await SecureStore.getItemAsync('selectedCategory');
+            console.log("=======================================================================")
+            console.log(storedCategory);
             const storedCategoryParse : Category | null = JSON.parse(storedCategory || 'null');
+            console.log(storedCategoryParse);
             storedCategoryParse && setCategorySelected(storedCategoryParse);
             const categories = await getCategories();
             setCategories(categories);
@@ -48,7 +51,7 @@ export default function HeaderContext({ onSelectCategory }: Props) {
         }
     }
 
-    const chooseCategory = (position: 'PREVIOUS' | 'NEXT') => {
+    const chooseCategory = async (position: 'PREVIOUS' | 'NEXT') => {
         console.log('categoryIndex', categoryIndex);
         if (categoryIndex !== null) {
             if (position === 'PREVIOUS' && categoryIndex === 0) return;
@@ -58,6 +61,7 @@ export default function HeaderContext({ onSelectCategory }: Props) {
             if (category && category.guid) {
                 setCategoryIndex(position === 'PREVIOUS' ? categoryIndex - 1 : categoryIndex + 1);
                 onSelectCategory(category.guid);
+                await SecureStore.setItemAsync('selectedCategory', JSON.stringify(category));
             }
         }
     }
@@ -95,7 +99,7 @@ export default function HeaderContext({ onSelectCategory }: Props) {
                                 <Ionicons name="chevron-back" size={24} color={categoryIndex === null || categoryIndex === 0 ? "#000" : "#fff"} />
                             </TouchableOpacity>
                             {/* Ao tocar na categoria abrir modal com todas as categorias para escolher uma */}
-                            <Text style={{ fontSize: 18, color: '#fff', flex: 1, textAlign: 'center' }}>{categoryIndex != null ? categories[categoryIndex].name : '----'}</Text>
+                            <Text style={styles.categoryText}>{categoryIndex != null ? categories[categoryIndex].name : '----'}</Text>
                             <TouchableOpacity disabled={categoryIndex === null || categoryIndex === categories.length - 1} style={{ flex: 1, alignItems: 'flex-end', paddingEnd: 20 }} onPress={() => chooseCategory('NEXT')}>
                                 <Ionicons name="chevron-forward" size={24} color={categoryIndex === null || categoryIndex === categories.length - 1 ? "#000" : "#fff"} />
                             </TouchableOpacity>
@@ -116,4 +120,10 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingStart: 8
     },
+    categoryText: {
+        fontSize: 14, 
+        color: '#fff', 
+        flex: 1, 
+        textAlign: 'center' 
+    }
 })

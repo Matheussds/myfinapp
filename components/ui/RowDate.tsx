@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function RowDate( { value, date, color }: { value: number, date: string, color: string } ) {
+export default function RowDate({ value, month, date, color }: { value: number, month: string, date: string, color: string }) {
     return (
         <View style={styles.dateContainer}>
             <Text style={[styles.tagValue, { color }]}>D {value}</Text>
-            <Text style={styles.textDate}>{date}</Text>
+            <Text style={styles.textDate}>{date + "-" + month}</Text>
         </View>
     )
 }

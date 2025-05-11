@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
 const colors: string[] = [
-    '#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#8E44AD', '#E74C3C',
-    '#3498DB', '#2ECC71', '#9B59B6', '#E67E22', '#1ABC9C', '#34495E'
+    'FF5733', '33FF57', '3357FF', 'F1C40F', '8E44AD', 'E74C3C',
+    '3498DB', '2ECC71', '9B59B6', 'E67E22', '1ABC9C', '34495E',
+    '003087', '005566', 'F58025', 'CC092F', 'EC0000', '820AD1',
+    'FF6200', '008B5D', 'FFC107', '009739', '003366'
 ];
 
 interface Props {
@@ -23,8 +25,8 @@ export default function ColorPicker({ onSelectColor }: Props) {
     const renderColorItem = ({ item }: { item: string }) => (
         <TouchableOpacity
             style={[styles.colorBox, {
-                backgroundColor: item,
-                borderColor: selectedColor === item ? '#0ff' : '#fff',
+                backgroundColor: '#' + item,
+                borderColor: selectedColor === item ? '#000' : '#fff',
                 borderWidth: selectedColor === item ? 4 : 0
             }]}
             onPress={() => handleColorSelect(item)}
@@ -50,15 +52,17 @@ const styles = StyleSheet.create({
         // flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 5,
         // borderWidth: 1,
-        // borderColor: '#000',
         // height: 150
     },
     colorBox: {
-        width: 60,
-        height: 60,
+        width: 40,
+        height: 40,
         margin: 8,
         borderRadius: 5,
+        // backgroundColor: '#fff'
         // borderWidth: 2,
         // borderColor: '#fff'
     }

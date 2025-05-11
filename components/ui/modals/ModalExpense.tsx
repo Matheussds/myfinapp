@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import MyModal from "./Modal";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 import { postMoneyExpense } from "@mocks/mockAPI";
 import { Expense, Card, PaymentMethod } from "entity";
 import ButtonsSetup from "../ButtonsSetup";
 import CardList from "../cards/CardList";
+import ChooseDisplay from "../ChooseDisplay";
 
 /*
 PaymentMethodId:
@@ -26,20 +27,19 @@ interface Props {
 export default function ModalExpense(props: Props) {
     const [inputExpenseValue, setInputExpenseValue] = useState('');
     const [inputExpenseDescription, setInputExpenseDescription] = useState('');
+    const [inputExpenseInstallmets, setInputExpenseInstallmets] = useState('');
     const [modalVisible, setModalVisible] = useState(props.modalVisible);
     const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+    const [showInstallmentsInput, setShowInstallmentsInput] = useState(false);
+    const [credit, setCredit] = useState(props.paymentMethod == 3);
 
     const resetAndCloseModal = () => {
         setInputExpenseValue('');
         setInputExpenseDescription('');
+        setInputExpenseInstallmets('');
+        setShowInstallmentsInput(false);
         setSelectedCard(null);
         setModalVisible(false);
-        props.onClose();
-    }
-
-    const handleCancelAddExpense = () => {
-        setModalVisible(false);
-        setSelectedCard(null);
         props.onClose();
     }
 
@@ -75,35 +75,54 @@ export default function ModalExpense(props: Props) {
         setModalVisible(props.modalVisible)
     }, [props.modalVisible])
 
+    useEffect(() => {
+        setCredit(props.paymentMethod == 3);
+    }, [props.paymentMethod])
+
     return (
         <MyModal modalVisible={modalVisible} onClose={resetAndCloseModal}>
-            {[3, 4].includes(props.paymentMethod) && (
-                <CardList onSelect={setSelectedCard} onCancelAddCard={resetAndCloseModal}/>
-            )}
+            <View style={{ backgroundColor: "#E8E2E2", borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+                {[3, 4].includes(props.paymentMethod) && (
+                    <CardList onSelect={setSelectedCard} onCancelAddCard={resetAndCloseModal} credit={credit} />
+                )}
 
-            {([1, 2].includes(props.paymentMethod) || ([3, 4].includes(props.paymentMethod) && selectedCard != null)) && (
-                <>
-                    <View style={{ width: '100%', alignItems: "center", paddingHorizontal: 20 }}>
-                        <Text style={styles.modalText}>Adicionar um novo gasto</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Valor do gasto..."
-                            value={inputExpenseValue}
-                            onChangeText={(text) => setInputExpenseValue(text)}
+                {([1, 2].includes(props.paymentMethod) || ([3, 4].includes(props.paymentMethod) && selectedCard != null)) && (
+                    <>
+                        <View style={{ alignItems: "center", padding: 20, gap: 8 }}>
+                            {/* <Text style={styles.modalText}>Adicionar um novo gasto</Text> */}
+
+                            {props.paymentMethod === 3 && <ChooseDisplay isOpenParcelas={showInstallmentsInput} onSetOpenParcelas={setShowInstallmentsInput} />}
+
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Valor do gasto"
+                                keyboardType="number-pad"
+                                value={inputExpenseValue}
+                                onChangeText={(text) => setInputExpenseValue(text)}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Descrição do gasto"
+                                value={inputExpenseDescription}
+                                onChangeText={(text) => setInputExpenseDescription(text)}
+                            />
+                            {showInstallmentsInput &&
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Parcelas a pagar"
+                                    keyboardType="number-pad"
+                                    value={inputExpenseInstallmets}
+                                    onChangeText={(text) => setInputExpenseInstallmets(text)}
+                                />
+                            }
+                        </View>
+                        <ButtonsSetup
+                            onCancel={resetAndCloseModal}
+                            onAdd={handleAddExpense}
                         />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Descrição do gasto..."
-                            value={inputExpenseDescription}
-                            onChangeText={(text) => setInputExpenseDescription(text)}
-                        />
-                    </View>
-                    <ButtonsSetup
-                        onCancel={() => handleCancelAddExpense()}
-                        onAdd={handleAddExpense}
-                    />
-                </>
-            )}
+                    </>
+                )}
+            </View>
         </MyModal>
     )
 }
@@ -117,10 +136,10 @@ const styles = StyleSheet.create({
     input: {
         height: 50,
         borderColor: '#ccc',
+        width: '100%',
         borderWidth: 1,
         borderRadius: 5,
-        width: '100%',
-        marginBottom: 20,
+        backgroundColor: '#fff',
         paddingHorizontal: 10,
     }
 });
