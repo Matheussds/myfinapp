@@ -1,5 +1,5 @@
 export type Expense = {
-    guid: string;
+    guid?: string | null;
     description: string;
     value: number;
     spentAt: Date;

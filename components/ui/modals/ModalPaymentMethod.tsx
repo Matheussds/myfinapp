@@ -45,7 +45,7 @@ const ModalMethod = (props: Props) => {
                                     onPress={() => setOpenCardMethods(true)}
                                 >
                                     <Text style={{ textAlign: "center" }}>
-                                        <FontAwesome6 name="credit-card" size={36} color={'#fff'} />
+                                        <FontAwesome6 name="credit-card" size={36} color={'#052BC2'} />
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
@@ -53,7 +53,7 @@ const ModalMethod = (props: Props) => {
                                     onPress={() => handleSelectedMethod(PaymentMethod.PIX)}
                                 >
                                     <Text style={{ textAlign: "center" }}>
-                                        <FontAwesome6 name="pix" size={36} color="#fff" />
+                                        <FontAwesome6 name="pix" size={36} color="#052BC2" />
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
@@ -61,7 +61,7 @@ const ModalMethod = (props: Props) => {
                                     onPress={() => handleSelectedMethod(PaymentMethod.Money)}
                                 >
                                     <Text style={{ textAlign: "center" }}>
-                                        <FontAwesome6 name="money-bill-1" size={36} color="#fff" />
+                                        <FontAwesome6 name="money-bill-1" size={36} color="#052BC2" />
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -79,13 +79,13 @@ const ModalMethod = (props: Props) => {
                                     style={styles.button}
                                     onPress={() => handleSelectedMethod(PaymentMethod.Credit)}
                                 >
-                                    <Text style={styles.closeButtonText}>Crédito</Text>
+                                    <Text style={styles.cardMethodText}>Crédito</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.button}
                                     onPress={() => handleSelectedMethod(PaymentMethod.Debit)}
                                 >
-                                    <Text style={styles.closeButtonText}>Débito</Text>
+                                    <Text style={styles.cardMethodText}>Débito</Text>
                                 </TouchableOpacity>
                             </View>
                             <TouchableOpacity
@@ -106,10 +106,12 @@ const styles = StyleSheet.create({
     button: {
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#000',
+        borderColor: '#052BC2',
+        backgroundColor: '#fff',
         height: 90,
         flex: 1,
-        borderRadius: 5,
+        borderRadius: 10,
+        borderWidth: 2
     },
     buttonText: {
         color: '#FFFFFF',
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente
     },
     modalContent: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: "#E8E2E2",
         borderRadius: 10,
         alignItems: 'center'
     },
@@ -138,6 +140,10 @@ const styles = StyleSheet.create({
     },
     closeButtonText: {
         color: '#FFFFFF',
+        fontSize: 16,
+    },
+    cardMethodText: {
+        color: '#052BC2',
         fontSize: 16,
     },
     methods: {
