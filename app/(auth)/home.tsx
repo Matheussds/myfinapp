@@ -89,8 +89,6 @@ export default function Home() {
   };
 
   const renderInstallments = ({ item }: { item: InstallmentsList }) => {
-    console.log("renderInstallments: " + item.guid);
-    console.log("renderInstallments: " + item.value);
     return (
       <React.Fragment key={generateKey()}>
         <RowValue
@@ -158,9 +156,6 @@ export default function Home() {
   }
 
   const handleDaysList = (expensesMonthYear: ExpensesMonthYear) => {
-    console.log("handleDaysList: " + expensesMonthYear.day_expenses.length);
-    if (expensesMonthYear.day_expenses.length) console.log("total expenses: " + expensesMonthYear.day_expenses[0].expenses.length);
-
     setDaysList([]);
 
     setDaysList(expensesMonthYear.day_expenses.map(day_expense => ({
@@ -171,9 +166,8 @@ export default function Home() {
   }
 
   const handleInstallmentsMonth = (expensesMonthYear: ExpensesMonthYear) => {
-    console.log("handleInstallmentsMonth: " + expensesMonthYear.installments.length);
     setInstallmentsMonth(expensesMonthYear.installments.map(installment => ({
-      guid: installment.guid,
+      guid: installment.guid ?? "",
       value: installment.value,
       currentInstallment: installment.installment_number ?? 0,
       totalInstallments: installment.installments ?? 0,
@@ -182,21 +176,17 @@ export default function Home() {
   }
 
   const handleSelectCategory = (guid: string) => {
-    console.log("handleSelectCategory: " + guid);
     setDaysList([]);
     setInstallmentsMonth([]);
     setSpentInTheMounth(0);
     setSelectedCategoryGUID(guid);
     const category = expensesData?.find(exp => exp.category_guid === guid);
-    console.log("category month length: " + category?.expenses_month_year.length);
     if (!category) return;
 
-    console.log("data de despesas: " + monthYearOfExpenses);
     const expensesMonthYear = category.expenses_month_year.find(
       exp => exp.month_year === monthYearOfExpenses);
     if (!expensesMonthYear) return;
 
-    console.log("Gastos do mês: " + expensesMonthYear.day_expenses.length);
     setSpentInTheMounth(expensesMonthYear.total_value);
     handleDaysList(expensesMonthYear);
     handleInstallmentsMonth(expensesMonthYear);
@@ -207,16 +197,15 @@ export default function Home() {
       const limitsApi = await getLimits();
       setLimitsData(limitsApi);
     } catch (error) {
+      console.log(error);
       console.error("Erro ao buscar os limites");
     }
   }
 
   const loadExpenses = async () => {
     try {
-      console.log("load expenses")
       const expensesApi = await getExpenses();
       setExpensesData(expensesApi);
-      console.log("Expenses carregadas")
     } catch (error) {
       console.error("Erro ao buscar despesas:", error);
     }
@@ -224,7 +213,6 @@ export default function Home() {
 
   const getMonthTotal = () => {
     if (expensesData) {
-      console.log("Expenses do mês");
       const expensesMonthYear: ExpensesMonthYear[] = [];
       expensesData.forEach(expens => {
         const expensesMonth = expens.expenses_month_year.find(emy => emy.month_year === monthYearOfExpenses)
@@ -235,7 +223,6 @@ export default function Home() {
 
       if (expensesMonthYear) {
         const monthTotal = expensesMonthYear.reduce((acc, exp) => acc + exp.total_value, 0);
-        console.log(monthTotal);
         return setMonthTotal(monthTotal);
       }
     }
@@ -249,17 +236,17 @@ export default function Home() {
 
 
   useEffect(() => {
+    console.log("Home renderizada por alteração no mês e ano");
     getMonthTotal();
   }, [monthYearOfExpenses])
 
   useEffect(() => {
-    console.log("Entrada index")
+    console.log("Home renderizada");
     setLoading(true); // Inicia o carregamento
     const initialize = async () => {
       await loadLimits();
       await loadExpenses(); // Busca os dados apenas se autenticado
       setLoading(false); // Para o carregamento
-      console.log("loading false")
     };
 
     initialize();

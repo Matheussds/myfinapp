@@ -1,20 +1,32 @@
-// import { Stack, Redirect } from 'expo-router';
-// import { useAuth } from '../../context/AuthContext';
-// import LoadingScreen from '@components/ui/LoadingScreen';
-
 import { Stack, useRouter } from 'expo-router';
-import { useContext, useEffect } from 'react';
-import AuthContext from '../../context/AuthContext';
+import { useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import useErrorStore from 'store/errorStore';
 
 export default function AuthLayout() {
-  const { loading, signed } = useContext(AuthContext);
+  const { loading, signed, signOut } = useAuth();
+  const { error } = useErrorStore();
   const router = useRouter();
 
   useEffect(() => {
+    if (error) {
+      if (error === 'Usuário não autenticado') {
+        signOut();
+        router.replace('/(public)/login');
+        return
+      }
+
+      router.replace('/error'); // Use replace para evitar empilhar rotas
+      // Limpa o erro após navegar (opcional)
+      return
+    }
+
     if (!loading && !signed) {
+      console.log("Redirecionado para login.")
       router.replace('/login');
     }
-  }, [signed, loading]);
+  }, [signed, loading, error]);
+
 
   if (loading) {
     return null; // Ou uma tela de carregamento
@@ -22,19 +34,3 @@ export default function AuthLayout() {
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }
-
-// export default function AppLayout() {
-//   const { isAuthenticated, loading } = useAuth();
-
-//   if (loading) {
-//     console.log("Loading app")
-//     return <LoadingScreen />;
-//   }
-
-//   if (!isAuthenticated) {
-//     console.log("Indo para login")
-//     return <Redirect href="/login" />;
-//   }
-
-//   return <Stack screenOptions={{ headerShown: false }}/>;
-// }

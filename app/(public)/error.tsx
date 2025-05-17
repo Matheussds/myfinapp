@@ -1,7 +1,15 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useEffect } from "react";
+import useErrorStore from "store/errorStore";
 
 export default function ErrorView() {
+    const { error } = useErrorStore();
+
+    useEffect(() => {
+        console.log("View Erro renderizada.")
+    }, [error])
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.container}>

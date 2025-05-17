@@ -1,13 +1,17 @@
 import { useRouter } from 'expo-router';
-import { useContext, useEffect } from 'react';
-import AuthContext from '../context/AuthContext';
+import { useEffect } from 'react';
+import { setupInterceptors } from '@api/client';
+import { useAuth } from 'context/AuthContext';
 
 export default function Index() {
-  const { signed, loading } = useContext(AuthContext);
+  const { signed, loading, signOut } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    setupInterceptors(signOut)
+    console.log("Interceptors iniciados");
     if (!loading) {
+      console.log("Indo para: " + (signed ? '/home' : '/login'))
       router.replace(signed ? '/home' : '/login');
     }
   }, [signed, loading]);

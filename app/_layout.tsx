@@ -10,23 +10,3 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
-
-// export default function RootLayout() {
-//   return (
-//     <AuthProvider>
-//       <AuthLayout />
-//     </AuthProvider>
-//   );
-// }
-
-// function AuthLayout() {
-//   const { loading } = useAuth();
-
-//   if (loading) {
-//     console.log("Loading raiz")
-//     return <LoadingScreen />;
-//   }
-
-//   //Talvez o uso de slot não seja mais util
-//   return <Slot screenOptions={{ headerShown: false }}/>;
-// }

@@ -12,11 +12,13 @@ interface Props {
 export default function HeaderApp(props: Props) {
     return (
         <View style={styles.headerContainer}>
-            <View style={{ justifyContent: 'space-between', paddingStart: 40, flexDirection: 'row', alignItems: 'flex-end', height: 50 }}>
+            <View style={{ justifyContent: 'space-between', paddingStart: 40, flexDirection: 'row', alignItems: 'center', height: 50 }}>
+
                 <View style={{ paddingVertical: 4 }}>
                     <Text style={{ color: '#fff', fontSize: 12 }}>Total mensal </Text>
                     <Text style={{ color: '#fff', fontSize: 24 }}>{brasilCurrency(props.monthTotal)}</Text>
                 </View>
+                <Text style={{ fontSize: 26, color: '#fff', fontWeight: 'bold' }}>MyFin</Text>
                 <TouchableOpacity onPress={props.onOpenMenu} style={styles.btnMenu}>
                     <MaterialIcons name="menu-open" size={38} color="#052BC2" />
                 </TouchableOpacity>

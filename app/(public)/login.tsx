@@ -1,19 +1,20 @@
-import React, { useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
-import AuthContext from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { UserCredentialsDTO } from '@api/DTOs/credentionsDTO';
+import useErrorStore from 'store/errorStore';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 WebBrowser.maybeCompleteAuthSession();
 
 const Login: React.FC = () => {
-    const { signIn } = useContext(AuthContext);
+    const { signIn } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     // const [userInfo, setUserInfo] = useState(null);
@@ -21,48 +22,15 @@ const Login: React.FC = () => {
         clientId: '1000500310954-b0b5dqdbn3665jsapn3pim3s3ehubs1l.apps.googleusercontent.com',
         redirectUri: 'https://auth.expo.io/@matheussds/myfin',
     });
+    const { clearError } = useErrorStore();
 
     const router = useRouter();
-
-    // const loadCredentials = async (email: string, password: string) => {
-    //     try {
-    //         const tokenValid = await checkToken(); // Verifica se o token está válido
-    //         console.log('Token válido:', tokenValid);
-
-    //         if (tokenValid) {
-    //             signIn(tokenValid); // Chama a função para marcar como autenticado
-    //             router.push('/'); // Redireciona para a tela inicial após o login
-    //         } else {
-    //             console.log('Tentando fazer login com email e senha...');
-    //             const credentials = await fetch(`${apiUrl}/api/users/auth/login`, {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 body: JSON.stringify({ email, password }),
-    //             });
-    //             const json = await credentials.json();
-    //             if (!credentials.ok) {
-    //                 console.error('Erro ao validar:', json);
-    //                 Alert.alert('Erro', 'Usuário ou senha inválidos!');
-    //                 return
-    //             }
-    //             console.log('Resposta:', json);
-    //             const { accessToken } = json; // Supondo que o token esteja na resposta
-    //             signIn(accessToken); // Chama a função para marcar como autenticado
-    //             router.push('/');
-    //         }
-    //     }
-    //     catch (error) {
-    //         console.error('Erro ao carregar as credenciais', error);
-    //     }
-    // };
 
     const handleLogin = async () => {
         try {
             //Definir os tipos dos dados de resposta UserDTO
             //o response.data deve ser do tipo UserDTO
-            const response: { data: UserCredentialsDTO }= await axios.post(apiUrl + '/api/users/auth/login', { email, password });
+            const response: { data: UserCredentialsDTO } = await axios.post(apiUrl + '/api/users/auth/login', { email, password });
             const { token, user } = response.data;
 
             if (!user.guid) {
@@ -77,61 +45,10 @@ const Login: React.FC = () => {
         }
     };
 
-    // const handleSubmit = () => {
-    //     try {
-    //         loadCredentials(email, password); // Chama a função para carregar as credenciai
-    //     } catch (error) {
-    //         if (error instanceof z.ZodError) {
-    //             Alert.alert('Erro', error.errors.map(err => err.message).join('\n'));
-    //         }
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     console.log('tela de loguin', request);
-    // }, []);
-
-    // useEffect(() => {
-    //     const checkAuth = async () => {
-    //         console.log("useEffect Login.tsx -> checkToken()");
-    //         try {
-    //             const tokenValid = await checkToken(); // Verifica se o token está válido
-
-    //             if (tokenValid) {
-    //                 console.log('useEffect Login.tsx -> Token válidado');
-    //                 console.log('useEffect Login.tsx -> Armazenando token com signIn...');
-    //                 signIn(tokenValid); // Chama a função para marcar como autenticado
-    //                 console.log('Redirect -> /home');
-    //                 router.push('/'); // Redireciona para a tela inicial após o login
-    //             }
-    //         } catch (error) {
-    //             console.error('Erro ao carregar as credenciais', error);
-    //         }
-    //     }
-
-    //     checkAuth(); // Verifica se o token está válido quando a tela de login é carregada
-
-    //     if (response?.type === 'success') {
-    //         // if (response?.type === 'dismiss') {
-    //         const { id_token } = response.params;
-    //         const { authentication } = response;
-    //         // Aqui você pode tratar o token e fazer a autenticação
-    //         console.log(authentication);
-    //         console.log('JWT Token:', id_token);
-
-    //         fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${id_token}`)
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 setUserInfo(data);
-    //                 // Você pode salvar o email ou outros dados que precisar
-    //                 console.log('User Info:', data);
-    //                 signInWithGoogle(data); // Chama a função para marcar como autenticado
-    //             })
-    //             .catch(error => console.error('Error fetching user info:', error));
-
-    //         // router.push('/'); // Redireciona para a tela inicial após o login
-    //     }
-    // }, [response]);
+    useEffect(() => {
+        console.log("Login renderizada");
+        clearError();
+    }, [])
 
     return (
         <View style={styles.container}>

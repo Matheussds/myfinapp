@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import MyModal from "./Modal";
 import { StyleSheet, TextInput, View } from "react-native";
-import { postMoneyExpense } from "@mocks/mockAPI";
 import { Expense, Card, PaymentMethod } from "entity";
 import ButtonsSetup from "../ButtonsSetup";
 import CardList from "../cards/CardList";
@@ -45,14 +44,14 @@ export default function ModalExpense(props: Props) {
 
     const handleAddExpense = async () => {
         try {
-            const id = await postMoneyExpense({
-                value: parseFloat(inputExpenseValue),
-                description: inputExpenseDescription
-            }, 2025, 3, props.categoryGUID);
+            // const id = await postMoneyExpense({
+            //     value: parseFloat(inputExpenseValue),
+            //     description: inputExpenseDescription
+            // }, 2025, 3, props.categoryGUID);
 
             const expense: Expense = {
                 category_guid: props.categoryGUID,
-                guid: id,
+                guid: null,
                 payment_method_id: props.paymentMethod,
                 spentAt: new Date(),
                 is_recurring: false,

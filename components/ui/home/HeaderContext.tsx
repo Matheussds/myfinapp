@@ -30,10 +30,7 @@ export default function HeaderContext({ onSelectCategory }: Props) {
         try {
             setIsLoading(true);
             const storedCategory = await SecureStore.getItemAsync('selectedCategory');
-            console.log("=======================================================================")
-            console.log(storedCategory);
             const storedCategoryParse : Category | null = JSON.parse(storedCategory || 'null');
-            console.log(storedCategoryParse);
             storedCategoryParse && setCategorySelected(storedCategoryParse);
             const categories = await getCategories();
             setCategories(categories);
@@ -52,7 +49,6 @@ export default function HeaderContext({ onSelectCategory }: Props) {
     }
 
     const chooseCategory = async (position: 'PREVIOUS' | 'NEXT') => {
-        console.log('categoryIndex', categoryIndex);
         if (categoryIndex !== null) {
             if (position === 'PREVIOUS' && categoryIndex === 0) return;
             if (position === 'NEXT' && categoryIndex === categories.length - 1) return;
@@ -66,16 +62,12 @@ export default function HeaderContext({ onSelectCategory }: Props) {
         }
     }
 
-    useEffect(() => {
-        console.log('HeaderContext mounted');
-        
+    useEffect(() => {        
         loadCategories();
     }, []);
 
     useEffect(() => {
         const categoryIndex = categories.findIndex((cat) => cat.guid === categorySelected?.guid)
-        console.log('categoryIndex', categoryIndex);
-        console.log(categories);
         if (categoryIndex >= 0) {
             setCategoryIndex(categoryIndex);
             if (categorySelected && categorySelected.guid) {
