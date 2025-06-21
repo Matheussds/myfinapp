@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState, useCallback } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { User } from '@entity';
 import api from '@api/client';
@@ -23,8 +23,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AuthContext: Iniciando verificação de token");
     const checkToken = async () => {
-      console.log("Check")
       try {
         const savedToken = await SecureStore.getItemAsync('authToken');
         if (savedToken) {
@@ -32,20 +32,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (response.status === 200) {
             setToken(savedToken);
             setIsAuthenticated(true);
+            console.log("AuthContext: Token válido encontrado");
           }
+        } else {
+          console.log("AuthContext: Nenhum token encontrado");
         }
       } catch (error) {
-        console.log('Erro ao verificar token:', error);
+        console.log('AuthContext: Erro ao verificar token:', error);
       } finally {
         setLoading(false);
+        console.log("AuthContext: Verificação de token concluída");
       }
     };
     checkToken();
-    console.log("Out check")
   }, []);
 
-  const signIn = async (newToken: string, userGUID: string, user: User) => {
-    console.log("Login context")
+  const signIn = useCallback(async (newToken: string, userGUID: string, user: User) => {
+    console.log("AuthContext: Realizando login");
     await SecureStore.setItemAsync('authToken', newToken);
     await SecureStore.setItemAsync('authUser', JSON.stringify(user));
     await SecureStore.setItemAsync('authUserGUID', userGUID);
@@ -53,9 +56,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserGUID(userGUID);
     setUser(user);
     setIsAuthenticated(true);
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
+    console.log("AuthContext: Realizando logout");
     await SecureStore.deleteItemAsync('authToken');
     await SecureStore.deleteItemAsync('authUser');
     await SecureStore.deleteItemAsync('authUserGUID');
@@ -63,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setUserGUID(null);
     setIsAuthenticated(false);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ signed: isAuthenticated, token, user, userGUID, signIn, signOut, loading }}>

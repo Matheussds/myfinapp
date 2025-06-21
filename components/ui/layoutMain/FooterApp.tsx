@@ -1,11 +1,14 @@
+import React, { useState, useEffect } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { formatDateToMonthYear } from "@utils/DateFormatter";
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { colors, spacing, borderRadius, shadows } from '../../../utils/designSystem';
+import Text from '../base/Text';
 
 type Props = {
     onDateChange: (monthYear: string) => void;
 }
+
 const formatDate = (month: number, year: number) => {
     const date = new Date(year, month);
     const monthName = date.toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
@@ -14,42 +17,79 @@ const formatDate = (month: number, year: number) => {
 
 export default function FooterApp({ onDateChange }: Props) {
     const [date, setDate] = useState(new Date());
-    const colorBlue = '#052BC2';
 
     const handleIncrease = () => {
         const newDate = new Date(date.getFullYear(), date.getMonth() + 1);
         setDate(newDate);
-        onDateChange(formatDateToMonthYear(newDate));
+        const newMonthYear = formatDateToMonthYear(newDate);
+        console.log('FooterApp: aumentando data para:', newMonthYear);
+        onDateChange(newMonthYear);
     };
 
     const handleDecrease = () => {
         const newDate = new Date(date.getFullYear(), date.getMonth() - 1);
         setDate(newDate);
-        onDateChange(formatDateToMonthYear(newDate));
+        const newMonthYear = formatDateToMonthYear(newDate);
+        console.log('FooterApp: diminuindo data para:', newMonthYear);
+        onDateChange(newMonthYear);
     };
 
     return (
-        <View style={styles.footerContainer}>
-            <TouchableOpacity style={{ flex: 1, alignItems: 'flex-start', paddingStart: 20 }} onPress={() => handleDecrease()}>
-                <Ionicons name="chevron-back" size={40} color={colorBlue} />
+        <View style={styles.container}>
+            {/* Botão anterior */}
+            <TouchableOpacity 
+                style={styles.navButton} 
+                onPress={handleDecrease}
+                activeOpacity={0.7}
+            >
+                <Ionicons name="chevron-back" size={24} color={colors.primary[500]} />
             </TouchableOpacity>
-            <Text style={{ fontSize: 18, color: '#000', flex: 1, textAlign: 'center' }}>
-                {formatDate(date.getMonth(), date.getFullYear())}
-            </Text>
-            <TouchableOpacity style={{ flex: 1, alignItems: 'flex-end', paddingEnd: 20 }} onPress={() => handleIncrease()}>
-                <Ionicons name="chevron-forward" size={40} color={colorBlue} />
+
+            {/* Mês/Ano atual */}
+            <View style={styles.dateContainer}>
+                <Text variant="h4" color="primary" weight="semibold" align="center">
+                    {formatDate(date.getMonth(), date.getFullYear())}
+                </Text>
+            </View>
+
+            {/* Botão próximo */}
+            <TouchableOpacity 
+                style={styles.navButton} 
+                onPress={handleIncrease}
+                activeOpacity={0.7}
+            >
+                <Ionicons name="chevron-forward" size={24} color={colors.primary[500]} />
             </TouchableOpacity>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-    footerContainer: {
+    container: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: 80,
-        width: '100%',
-        backgroundColor: '#fff',
-        borderTopRightRadius: 50
+        justifyContent: 'space-between',
+        backgroundColor: colors.background.primary,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+        borderTopLeftRadius: borderRadius['2xl'],
+        borderTopRightRadius: borderRadius['2xl'],
+        ...shadows.md,
     },
-})
+    
+    navButton: {
+        width: 48,
+        height: 48,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.neutral[100],
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...shadows.sm,
+    },
+    
+    dateContainer: {
+        flex: 1,
+        alignItems: 'center',
+        paddingHorizontal: spacing.md,
+    },
+});

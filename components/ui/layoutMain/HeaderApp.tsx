@@ -1,7 +1,10 @@
+import React from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Limit } from '@entity';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import brasilCurrency from '@utils/CurrencyFormatter';
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { colors, spacing, borderRadius, shadows } from '../../../utils/designSystem';
+import Text from '../base/Text';
 
 interface Props {
     onOpenMenu: () => void;
@@ -9,51 +12,108 @@ interface Props {
     monthTotal: number;
 }
 
-export default function HeaderApp(props: Props) {
+export default function HeaderApp({ onOpenMenu, limits, monthTotal }: Props) {
     return (
-        <View style={styles.headerContainer}>
-            <View style={{ justifyContent: 'space-between', paddingStart: 40, flexDirection: 'row', alignItems: 'center', height: 50 }}>
-
-                <View style={{ paddingVertical: 4 }}>
-                    <Text style={{ color: '#fff', fontSize: 12 }}>Total mensal </Text>
-                    <Text style={{ color: '#fff', fontSize: 24 }}>{brasilCurrency(props.monthTotal)}</Text>
+        <View style={styles.container}>
+            {/* Header principal */}
+            <View style={styles.mainHeader}>
+                {/* Logo e título */}
+                <View style={styles.logoSection}>
+                    <Text variant="h2" color="inverse" weight="bold">
+                        MyFin
+                    </Text>
                 </View>
-                <Text style={{ fontSize: 26, color: '#fff', fontWeight: 'bold' }}>MyFin</Text>
-                <TouchableOpacity onPress={props.onOpenMenu} style={styles.btnMenu}>
-                    <MaterialIcons name="menu-open" size={38} color="#052BC2" />
+
+                {/* Total mensal */}
+                <View style={styles.totalSection}>
+                    <Text variant="caption" color="inverse" align="center">
+                        Total mensal
+                    </Text>
+                    <Text variant="h3" color="inverse" weight="bold" align="center">
+                        {brasilCurrency(monthTotal)}
+                    </Text>
+                </View>
+
+                {/* Botão do menu */}
+                <TouchableOpacity 
+                    style={styles.menuButton} 
+                    onPress={onOpenMenu}
+                    activeOpacity={0.8}
+                >
+                    <MaterialIcons name="menu" size={24} color={colors.primary[500]} />
                 </TouchableOpacity>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', flex: 1, padding: 4 }}>
-                <View style={{ flexDirection: 'row', paddingStart: 40, gap: 14 }}>
-                    <View>
-                        <Text style={{ color: '#fff', fontSize: 12 }}>Limite mensal</Text>
-                        <Text style={{ color: '#fff' }}>{brasilCurrency(props.limits.monthly_limit)}</Text>
-                    </View>
-                    <View>
-                        <Text style={{ color: '#fff', fontSize: 12 }}>Limite diário</Text>
-                        <Text style={{ color: '#fff' }}>{brasilCurrency(props.limits.daily_limit)}</Text>
-                    </View>
+
+            {/* Informações de limite */}
+            <View style={styles.limitsSection}>
+                <View style={styles.limitItem}>
+                    <Text variant="caption" color="inverse" align="center">
+                        Limite mensal
+                    </Text>
+                    <Text variant="bodySmall" color="inverse" weight="medium" align="center">
+                        {brasilCurrency(limits.monthly_limit)}
+                    </Text>
+                </View>
+
+                <View style={styles.limitItem}>
+                    <Text variant="caption" color="inverse" align="center">
+                        Limite diário
+                    </Text>
+                    <Text variant="bodySmall" color="inverse" weight="medium" align="center">
+                        {brasilCurrency(limits.daily_limit)}
+                    </Text>
                 </View>
             </View>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-    headerContainer: {
-        paddingTop: 10,
-        height: 100,
-        width: '100%',
-        backgroundColor: '#052BC2',
-        borderBottomStartRadius: 50
+    container: {
+        backgroundColor: colors.primary[500],
+        paddingTop: spacing.lg,
+        paddingBottom: spacing.md,
+        paddingHorizontal: spacing.md,
+        borderBottomLeftRadius: borderRadius['2xl'],
+        borderBottomRightRadius: borderRadius['2xl'],
+        ...shadows.md,
     },
-    btnMenu: {
-        backgroundColor: '#E8E2E2',
-        width: 80,
-        height: 40,
+    
+    mainHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: spacing.md,
+    },
+    
+    logoSection: {
+        flex: 1,
+        alignItems: 'flex-start',
+    },
+    
+    totalSection: {
+        flex: 2,
+        alignItems: 'center',
+    },
+    
+    menuButton: {
+        backgroundColor: colors.background.primary,
+        width: 44,
+        height: 44,
+        borderRadius: borderRadius.lg,
         justifyContent: 'center',
         alignItems: 'center',
-        borderBottomLeftRadius: 10,
-        borderTopLeftRadius: 10
-    }
-})
+        ...shadows.sm,
+    },
+    
+    limitsSection: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingHorizontal: spacing.md,
+    },
+    
+    limitItem: {
+        alignItems: 'center',
+        flex: 1,
+    },
+});

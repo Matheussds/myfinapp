@@ -35,8 +35,13 @@ export const setupInterceptors = (signOut: () => Promise<void>) => {
             if (config.url.startsWith('/api/users/auth/')) {
                 return config; // Não adiciona o token para URLs de autenticação
             }
+            
+            if (config.data) {
+                console.log("Dados da requisição:", config.data);
+            }
 
             if (config.url!.startsWith('/api/users/')) {
+                
                 if (!userGuid) {
                     await signOut();
                 }
@@ -46,9 +51,7 @@ export const setupInterceptors = (signOut: () => Promise<void>) => {
             return config;
         },
         (error) => {
-            console.log("######################################################################")
-            console.log(error)
-
+            console.log("Erro no interceptor de requisição:", error);
             return Promise.reject(error)
         }
     );
@@ -56,7 +59,7 @@ export const setupInterceptors = (signOut: () => Promise<void>) => {
     //Interceptor de resposta: Trata erros 401
     api.interceptors.response.use(
         async (response) => {
-            // console.log(response);
+            console.log(`Resposta da API (${response.status}):`, response.config.url);
             if (response.status === 401) {
                 // Token inválido ou expirado
                 await signOut();
@@ -64,16 +67,24 @@ export const setupInterceptors = (signOut: () => Promise<void>) => {
             return response;
         },
         async (error) => {
+            console.log("Erro na resposta da API:", error.config?.url, error.response?.status, error.message);
+            
             if (!error.response) {
-                console.log("Error no AXIOS");
-                useErrorStore.getState().setError('Erro desconhecido no servidor');
+                console.log("Erro de rede ou timeout");
+                useErrorStore.getState().setError('Erro de conexão com o servidor');
             }
 
             if (error.response?.status === 401) {
-                console.log("Error 401");
+                console.log("Erro 401 - Token inválido");
                 useErrorStore.getState().setError('Usuário não autenticado');
-                signOut();
+                await signOut();
             }
+            
+            if (error.response?.status >= 500) {
+                console.log("Erro do servidor:", error.response.status);
+                useErrorStore.getState().setError('Erro interno do servidor');
+            }
+            
             return Promise.reject(error);
         }
     );

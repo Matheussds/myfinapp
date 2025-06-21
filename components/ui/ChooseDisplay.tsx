@@ -1,49 +1,104 @@
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { colors, spacing, borderRadius, shadows } from '../../utils/designSystem';
+import Text from './base/Text';
 
 interface Props {
     onSetOpenParcelas: (open: boolean) => void;
     isOpenParcelas: boolean;
+    showInstallmentsOption?: boolean;
 }
 
-export default function ChooseDisplay({onSetOpenParcelas, isOpenParcelas} : Props) {
-    const [openParcelas, setOpenParcelas] = useState(isOpenParcelas);
-    const colorBlue = '#052BC2';
-
-    const onSetOpen = (open: boolean) => {
-        setOpenParcelas(open);
-        onSetOpenParcelas(open);
-    }
+export default function ChooseDisplay({ onSetOpenParcelas, isOpenParcelas, showInstallmentsOption = true }: Props) {
+    const handleToggle = (showParcelas: boolean) => {
+        onSetOpenParcelas(showParcelas);
+    };
 
     return (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-            <TouchableOpacity onPress={() => onSetOpen(false)}
-                style={[styles.btn, styles.btnLeft, { backgroundColor: !openParcelas ? colorBlue : '#fff' }]}>
-                <Text style={[styles.title, { color: !openParcelas ? '#fff' : '#000' }]}>Á vista</Text>
+        <View style={styles.container}>
+            {/* Botão Á Vista */}
+            <TouchableOpacity 
+                style={[
+                    styles.button, 
+                    !showInstallmentsOption ? styles.fullWidthButton : styles.leftButton,
+                    !isOpenParcelas && styles.activeButton
+                ]}
+                onPress={() => handleToggle(false)}
+                activeOpacity={0.8}
+            >
+                <Text 
+                    variant="body" 
+                    color={!isOpenParcelas ? 'inverse' : 'secondary'} 
+                    weight="medium"
+                    align="center"
+                >
+                    Á Vista
+                </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => onSetOpen(true)}
-                style={[styles.btn, styles.btnRight, { backgroundColor: openParcelas ? colorBlue : '#fff' }]}>
-                <Text style={[styles.title, { color: openParcelas ? '#fff' : '#000' }]}>Parcelas</Text>
-            </TouchableOpacity>
+
+            {/* Botão Parcelas - só mostra se showInstallmentsOption for true */}
+            {showInstallmentsOption && (
+                <TouchableOpacity 
+                    style={[
+                        styles.button, 
+                        styles.rightButton,
+                        isOpenParcelas && styles.activeButton
+                    ]}
+                    onPress={() => handleToggle(true)}
+                    activeOpacity={0.8}
+                >
+                    <Text 
+                        variant="body" 
+                        color={isOpenParcelas ? 'inverse' : 'secondary'} 
+                        weight="medium"
+                        align="center"
+                    >
+                        Parcelas
+                    </Text>
+                </TouchableOpacity>
+            )}
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-    btn: {
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        width: '50%',
+    container: {
+        flexDirection: 'row',
+        width: '100%',
+        backgroundColor: colors.neutral[100],
+        borderRadius: borderRadius.lg,
+        padding: 2,
+        ...shadows.sm,
     },
-    btnLeft: {
-        borderTopLeftRadius: 10,
-        borderBottomLeftRadius: 10
+    
+    button: {
+        flex: 1,
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.md,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: borderRadius.md,
     },
-    btnRight: {
-        borderTopRightRadius: 10,
-        borderBottomRightRadius: 10
+    
+    leftButton: {
+        borderTopLeftRadius: borderRadius.lg,
+        borderBottomLeftRadius: borderRadius.lg,
     },
-    title: {
-        textAlign: "center"
-    }
-})
+    
+    fullWidthButton: {
+        borderTopLeftRadius: borderRadius.lg,
+        borderBottomLeftRadius: borderRadius.lg,
+        borderTopRightRadius: borderRadius.lg,
+        borderBottomRightRadius: borderRadius.lg,
+    },
+    
+    rightButton: {
+        borderTopRightRadius: borderRadius.lg,
+        borderBottomRightRadius: borderRadius.lg,
+    },
+    
+    activeButton: {
+        backgroundColor: colors.primary[500],
+        ...shadows.sm,
+    },
+});

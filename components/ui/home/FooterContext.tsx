@@ -1,55 +1,80 @@
-import { StyleSheet, Text, View } from "react-native";
-import ButtonCircle from "@ui/ButtonCircle"; // Adjusted the path to match the correct location
-import { useState } from "react";
-import { PaymentMethod } from "entity";
-import ModalMethod from "../modals/ModalPaymentMethod";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { PaymentMethod } from "@entity";
+import { ButtonCircle } from "@ui";
+import { colors, spacing } from '../../../utils/designSystem';
+import Text from '../base/Text';
+import { GENERAL_CATEGORY_GUID } from "@utils/constants";
 
 interface Props {
-    onMethodSelected: (paymentMethod: PaymentMethod) => void;
-    totalAmount: number;
+    paymentMethod: PaymentMethod;
+    onPaymentMethodChange: (paymentMethod: PaymentMethod, shouldOpenModal: boolean) => void;
+    categoryTotal: number;
+    categoryName?: string;
+    selectedCategoryGUID?: string | null;
 }
 
-export default function FooterContext({ onMethodSelected, totalAmount }: Props) {
-    const [openModalMethod, setOpenModalMethod] = useState(false);
+export default function FooterContext({ 
+    paymentMethod, 
+    onPaymentMethodChange, 
+    categoryTotal,
+    categoryName = "categoria",
+    selectedCategoryGUID
+}: Props) {
+    const handleAddExpense = () => {
+        console.log('FooterContext: handleAddExpense chamado - usuário clicou no botão');
+        // Só chama onPaymentMethodChange quando o usuário clicar no botão
+        // Isso evita que o modal abra automaticamente na inicialização
+        onPaymentMethodChange(paymentMethod, true); // true = deve abrir modal
+    };
 
-    const colorBlue = '#052BC2';
-
-    const handleAdd = (paymentMethod: PaymentMethod) => {
-        setOpenModalMethod(false);
-        onMethodSelected(paymentMethod);
-    }
+    const isGeneralCategory = selectedCategoryGUID === GENERAL_CATEGORY_GUID;
 
     return (
         <View style={styles.container}>
-            <View style={styles.contanerTotalValue}>
-                <Text style={{ fontSize: 20 }}>Total</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 14 }}>R$</Text>
-                    <Text style={{ fontSize: 30, color: colorBlue, textAlign: 'right' }}>{totalAmount}</Text>
+            <View style={styles.content}>
+                <View style={styles.totalSection}>
+                    <Text variant="caption" color="secondary" align="right">
+                        Total da {categoryName}
+                    </Text>
+                    <Text variant="h3" color="primary" weight="bold" align="right">
+                        R$ {categoryTotal.toFixed(2)}
+                    </Text>
                 </View>
+                
+                {!isGeneralCategory && (
+                    <ButtonCircle 
+                        backgroundColor={colors.primary[500]} 
+                        onPressAdd={handleAddExpense} 
+                        style={styles.addButton}
+                    />
+                )}
             </View>
-            <ButtonCircle backgroundColor={colorBlue} onPressAdd={() => setOpenModalMethod(true)} />
-            <ModalMethod isVisible={openModalMethod} onClose={() => setOpenModalMethod(false)} onSelectMethod={handleAdd} />
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: "row",
-        gap: 8,
-        paddingEnd: 8
+        backgroundColor: colors.background.primary,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: colors.neutral[200],
     },
-    contanerTotalValue: {
-        flex: 1,
-        height: 70,
+    
+    content: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#fff',
-        borderTopRightRadius: 100,
-        borderBottomRightRadius: 100,
-        padding: 4,
-        paddingHorizontal: 12
-    }
+        justifyContent: 'space-between',
+    },
+    
+    totalSection: {
+        flex: 1,
+        alignItems: 'flex-end',
+    },
+    
+    addButton: {
+        marginLeft: spacing.lg,
+    },
 });

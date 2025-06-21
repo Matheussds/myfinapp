@@ -1,45 +1,104 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { colors, spacing, borderRadius, shadows } from '../../utils/designSystem';
+import Text from './base/Text';
 
 type Props = {
     value: number;
     currentInstallment?: number;
     totalInstallments?: number;
     description: string;
-    color: string;
+    color?: string;
+    onPress?: () => void;
 }
 
-export default function RowValue({ value, currentInstallment, totalInstallments, description, color }: Props) {
+export default function RowValue({ 
+    value, 
+    currentInstallment, 
+    totalInstallments, 
+    description, 
+    color = colors.primary[500],
+    onPress 
+}: Props) {
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
     });
 
+    const Container = onPress ? TouchableOpacity : View;
+
     return (
-        <View style={styles.valueContainer}>
-            {currentInstallment === undefined ?
-                <>
-                    <Text style={{ width: '50%', fontSize: 20, color: color }}>{formatter.format(value)}</Text>
-                    <Text style={{ width: '50%', fontSize: 16, color: 'gray', textAlign: 'right' }}>{description}</Text>
-                </>
-                :
-                <>
-                    <Text style={{ width: '33%', fontSize: 20, color: color }}>{formatter.format(value)}</Text>
-                    <Text style={{ width: '33%', fontSize: 16, color: 'gray', textAlign: 'center' }}>{currentInstallment} de {totalInstallments}</Text>
-                    <Text style={{ width: '33%', fontSize: 16, color: 'gray', textAlign: 'right' }}>{description}</Text>
-                </>
-            }
-        </View>
-    )
+        <Container 
+            style={styles.container}
+            onPress={onPress}
+            activeOpacity={onPress ? 0.7 : 1}
+        >
+            {/* Valor principal */}
+            <View style={styles.valueSection}>
+                <Text 
+                    variant="h4" 
+                    color="primary" 
+                    weight="bold"
+                    style={{ color }}
+                >
+                    {formatter.format(value)}
+                </Text>
+            </View>
+
+            {/* Informações de parcela (se aplicável) */}
+            {currentInstallment && totalInstallments && (
+                <View style={styles.installmentSection}>
+                    <Text variant="caption" color="secondary" align="center">
+                        {currentInstallment} de {totalInstallments}
+                    </Text>
+                </View>
+            )}
+
+            {/* Descrição */}
+            <View style={styles.descriptionSection}>
+                <Text 
+                    variant="body" 
+                    color="secondary" 
+                    weight="medium"
+                    align="right"
+                    numberOfLines={2}
+                >
+                    {description}
+                </Text>
+            </View>
+        </Container>
+    );
 }
 
 const styles = StyleSheet.create({
-    valueContainer: {
+    container: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         width: '100%',
-        height: 40,
-        paddingHorizontal: 8
-    }
+        minHeight: 56,
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.md,
+        backgroundColor: colors.background.primary,
+        borderRadius: borderRadius.md,
+        marginVertical: spacing.xs,
+        ...shadows.sm,
+    },
+    
+    valueSection: {
+        flex: 1,
+        alignItems: 'flex-start',
+    },
+    
+    installmentSection: {
+        flex: 0.5,
+        alignItems: 'center',
+        paddingHorizontal: spacing.xs,
+    },
+    
+    descriptionSection: {
+        flex: 1.5,
+        alignItems: 'flex-end',
+        paddingLeft: spacing.sm,
+    },
 });

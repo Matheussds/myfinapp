@@ -1,3 +1,7 @@
+// Componentes base do design system
+export * from './base';
+
+// Componentes específicos
 export { default as ButtonCircle } from './ButtonCircle';
 export { default as Card } from './Card';
 export { default as ButtonsSetup } from './ButtonsSetup';

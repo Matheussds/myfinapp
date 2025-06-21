@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     card: {
         width: 190,
         height: 120,
-        borderRadius: 8
+        borderRadius: 10
     },
     cardSelected: {
         width: 210,

@@ -1,9 +1,11 @@
+import { useAuth } from 'context/AuthContext';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 
 const ModalFull = (props: { isVisible: boolean, onClose: () => void }) => {
     const [modalVisible, setModalVisible] = useState(props.isVisible);
     const [isEnabled, setIsEnabled] = useState(false);
+    const { signOut } = useAuth();
 
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
@@ -37,6 +39,12 @@ const ModalFull = (props: { isVisible: boolean, onClose: () => void }) => {
                 </View>
 
                 {/* Botão para fechar o modal */}
+                <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => signOut()}
+                >
+                    <Text style={styles.buttonText}>Sair</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.closeButton}
                     onPress={() => handleModalClose()}

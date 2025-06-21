@@ -19,6 +19,7 @@ export default function FormAddCard({ onAddCard, onCancel, credit }: Props) {
     const [dueDay, setDueDay] = useState<number | null>(1);
     const [closingDay, setClosingDay] = useState<number | null>(1);
     const [isLoading, setIsLoading] = useState(false);
+    const [validForm, setValidForm] = useState(false);
 
     const resetCardForm = () => {
         setInputCardDescription('');
@@ -153,7 +154,7 @@ export default function FormAddCard({ onAddCard, onCancel, credit }: Props) {
                         {/* <Text>Função:</Text> */}
 
                     </View>
-                    <ButtonsSetup onAdd={submitCard} onCancel={handleCancel} />
+                    <ButtonsSetup onAdd={submitCard} onCancel={handleCancel} addDisabled={validForm} />
                 </>
             )}
         </View>

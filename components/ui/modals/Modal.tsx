@@ -1,10 +1,13 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Modal, StyleSheet, View } from "react-native";
+import { Modal, StyleSheet, View, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { colors, spacing, borderRadius, shadows } from "../../../utils/designSystem";
 
 interface Props {
     modalVisible: boolean;
     children: ReactNode;
     onClose: () => void;
+    showCloseButton?: boolean;
 }
 
 const MyModal = (props: Props) => {
@@ -28,6 +31,15 @@ const MyModal = (props: Props) => {
         >
             <View style={styles.modalOverlay}>
                 <View style={styles.modalView}>
+                    {props.showCloseButton && (
+                        <TouchableOpacity 
+                            style={styles.closeButton}
+                            onPress={handleCloseModal}
+                            activeOpacity={0.7}
+                        >
+                            <Ionicons name="close" size={24} color={colors.text.secondary} />
+                        </TouchableOpacity>
+                    )}
                     {props.children}
                 </View>
             </View>
@@ -36,49 +48,33 @@ const MyModal = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-    buttonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-    },
     modalOverlay: {
         flex: 1,
-        justifyContent: 'flex-end', // Manter o modal na parte inferior
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
     },
     modalView: {
         width: '100%',
-        backgroundColor: 'white',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        // padding: 20,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5, // Para Android
-    },
-    modalText: {
-        marginBottom: 15,
-        textAlign: 'center',
-        fontSize: 18,
+        backgroundColor: colors.background.primary,
+        borderTopLeftRadius: borderRadius.xl,
+        borderTopRightRadius: borderRadius.xl,
+        paddingTop: spacing.lg,
+        paddingBottom: spacing.xl,
+        paddingHorizontal: spacing.lg,
+        ...shadows.lg,
     },
     closeButton: {
-        backgroundColor: '#FF5733',
-        padding: 10,
-        borderRadius: 5,
-    },
-    input: {
-        height: 50,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        width: '100%',
-        marginBottom: 20,
-        paddingHorizontal: 10,
-    },
-    resultText: {
-        marginTop: 20,
-        fontSize: 16,
+        position: 'absolute',
+        top: spacing.md,
+        right: spacing.md,
+        zIndex: 1,
+        width: 32,
+        height: 32,
+        borderRadius: borderRadius.full,
+        backgroundColor: colors.neutral[100],
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...shadows.sm,
     },
 });
 

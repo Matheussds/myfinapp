@@ -1,50 +1,51 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { spacing } from '../../utils/designSystem';
+import Button from './base/Button';
 
 interface Props {
     onCancel: () => void;
     onAdd: () => void;
+    addDisabled: boolean;
 }
 
-export default function ButtonsSetup({ onAdd, onCancel }: Props) {
-    //TODO Implementar o desabilitar botão.
+export default function ButtonsSetup({ onAdd, onCancel, addDisabled }: Props) {
     return (
-        <View style={{ flexDirection: 'row', width: '100%' }}>
-            <TouchableOpacity
-                style={[styles.button, styles.buttonCancel]}
-                onPress={() => onCancel()}
-            >
-                <Text style={styles.buttonText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.button, styles.buttonAdd]}
-                onPress={() => onAdd()}
-            >
-                <Text style={styles.buttonText}>Adicionar</Text>
-            </TouchableOpacity>
+        <View style={styles.container}>
+            <Button
+                title="Cancelar"
+                onPress={onCancel}
+                variant="outline"
+                size="large"
+                fullWidth
+                style={styles.cancelButton}
+            />
+            
+            <Button
+                title="Adicionar"
+                onPress={onAdd}
+                variant="primary"
+                size="large"
+                disabled={addDisabled}
+                fullWidth
+                style={styles.addButton}
+            />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    buttonText: {
-        textAlign: 'center',
-        color: '#FFFFFF',
-        fontSize: 16,
+    container: {
+        flexDirection: 'row',
+        width: '100%',
+        gap: spacing.sm,
     },
-    button: {
-        width: '50%',
-        padding: 10,
+    
+    cancelButton: {
+        flex: 1,
     },
-    buttonCancel: {
-        backgroundColor: '#da330d',
-        borderRightWidth: 1,
-        borderRightColor: '#ccc',
-        borderTopEndRadius: 20,
-    },
-    buttonAdd: {
-        backgroundColor: '#000',
-        borderLeftWidth: 1,
-        borderLeftColor: '#ccc',
-        borderTopStartRadius: 20,
+    
+    addButton: {
+        flex: 1,
     },
 });

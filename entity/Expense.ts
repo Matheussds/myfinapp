@@ -2,7 +2,7 @@ export type Expense = {
     guid?: string | null;
     description: string;
     value: number;
-    spentAt: Date;
+    spent_at: Date;
     category_guid: string;
     payment_method_id: number;
     card_guid?: string | null;

@@ -1,156 +1,158 @@
-import { PaymentMethod } from '@entity';
-import { FontAwesome6 } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from "react";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { PaymentMethod } from "@entity";
+import MyModal from "./Modal";
+import { colors, spacing, borderRadius, shadows } from "../../../utils/designSystem";
+import Text from "../base/Text";
+import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
-    isVisible: boolean;
+    modalVisible: boolean;
     onClose: () => void;
-    onSelectMethod: (id: PaymentMethod) => void;
+    onSelectPaymentMethod: (paymentMethod: PaymentMethod) => void;
 }
 
-const ModalMethod = (props: Props) => {
-    const [modalVisible, setModalVisible] = useState(props.isVisible);
-    const [openCardMethods, setOpenCardMethods] = useState(false);
+export default function ModalPaymentMethod({ 
+    modalVisible, 
+    onClose, 
+    onSelectPaymentMethod 
+}: Props) {
+    const paymentMethods = [
+        {
+            id: 1 as PaymentMethod,
+            name: "Dinheiro",
+            icon: "cash-outline",
+            description: "Pagamento em dinheiro",
+            color: colors.success[500]
+        },
+        {
+            id: 2 as PaymentMethod,
+            name: "PIX",
+            icon: "phone-portrait",
+            description: "Transferência PIX",
+            color: colors.primary[500]
+        },
+        {
+            id: 3 as PaymentMethod,
+            name: "Cartão de Crédito",
+            icon: "card-outline",
+            description: "Cartão de crédito",
+            color: colors.secondary[500]
+        },
+        {
+            id: 4 as PaymentMethod,
+            name: "Cartão de Débito",
+            icon: "card-outline",
+            description: "Cartão de débito",
+            color: colors.neutral[600]
+        }
+    ];
 
-    const handleSelectedMethod = (id: PaymentMethod) => {
-        props.onSelectMethod(id);
-        setOpenCardMethods(false);
-        setModalVisible(false);
-    }
-
-    const handleCloseModal = () => {
-        setModalVisible(false);
-        props.onClose();
-    }
-
-    useEffect(() => {
-        setModalVisible(props.isVisible);
-    }, [props.isVisible])
+    const handleSelectMethod = (paymentMethod: PaymentMethod) => {
+        onSelectPaymentMethod(paymentMethod);
+        onClose();
+    };
 
     return (
-        <Modal
-            animationType="fade"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={handleCloseModal}
-        >
-            <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                    {!openCardMethods ?
-                        <>
-                            <View style={styles.methods}>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => setOpenCardMethods(true)}
-                                >
-                                    <Text style={{ textAlign: "center" }}>
-                                        <FontAwesome6 name="credit-card" size={36} color={'#052BC2'} />
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => handleSelectedMethod(PaymentMethod.PIX)}
-                                >
-                                    <Text style={{ textAlign: "center" }}>
-                                        <FontAwesome6 name="pix" size={36} color="#052BC2" />
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => handleSelectedMethod(PaymentMethod.Money)}
-                                >
-                                    <Text style={{ textAlign: "center" }}>
-                                        <FontAwesome6 name="money-bill-1" size={36} color="#052BC2" />
-                                    </Text>
-                                </TouchableOpacity>
+        <MyModal modalVisible={modalVisible} onClose={onClose} showCloseButton={true}>
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text variant="h3" color="primary" weight="bold" align="center">
+                        Forma de Pagamento
+                    </Text>
+                    <Text variant="body" color="tertiary" align="center" style={styles.subtitle}>
+                        Escolha como você pagou este gasto
+                    </Text>
+                </View>
+
+                <View style={styles.methodsContainer}>
+                    {paymentMethods.map((method) => (
+                        <TouchableOpacity
+                            key={method.id}
+                            style={styles.methodButton}
+                            onPress={() => handleSelectMethod(method.id)}
+                            activeOpacity={0.8}
+                        >
+                            <View style={[styles.methodIcon, { backgroundColor: method.color + '15' }]}>
+                                <Ionicons 
+                                    name={method.icon as any} 
+                                    size={28} 
+                                    color={method.color} 
+                                />
                             </View>
-                            <TouchableOpacity
-                                style={styles.closeButton}
-                                onPress={handleCloseModal}
-                            >
-                                <Text style={styles.closeButtonText}>Voltar</Text>
-                            </TouchableOpacity>
-                        </>
-                        :
-                        <>
-                            <View style={styles.methods}>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => handleSelectedMethod(PaymentMethod.Credit)}
-                                >
-                                    <Text style={styles.cardMethodText}>Crédito</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => handleSelectedMethod(PaymentMethod.Debit)}
-                                >
-                                    <Text style={styles.cardMethodText}>Débito</Text>
-                                </TouchableOpacity>
+                            <View style={styles.methodInfo}>
+                                <Text variant="body" color="primary" weight="semibold">
+                                    {method.name}
+                                </Text>
+                                <Text variant="caption" color="tertiary">
+                                    {method.description}
+                                </Text>
                             </View>
-                            <TouchableOpacity
-                                style={styles.closeButton}
-                                onPress={() => setOpenCardMethods(false)}
-                            >
-                                <Text style={styles.closeButtonText}>Voltar</Text>
-                            </TouchableOpacity>
-                        </>
-                    }
+                            <View style={styles.arrowContainer}>
+                                <Ionicons 
+                                    name="chevron-forward" 
+                                    size={20} 
+                                    color={colors.neutral[400]} 
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    ))}
                 </View>
             </View>
-        </Modal >
+        </MyModal>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    button: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: '#052BC2',
-        backgroundColor: '#fff',
-        height: 90,
-        flex: 1,
-        borderRadius: 10,
-        borderWidth: 2
+    container: {
+        paddingTop: spacing.xl,
     },
-    buttonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
+    
+    header: {
+        marginBottom: spacing.xl,
+        paddingHorizontal: spacing.md,
     },
-    modalOverlay: {
-        flex: 1,
-        justifyContent: 'flex-end', // Manter o modal na parte inferior
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente
+    
+    subtitle: {
+        marginTop: spacing.sm,
+        lineHeight: 20,
     },
-    modalContent: {
-        backgroundColor: "#E8E2E2",
-        borderRadius: 10,
-        alignItems: 'center'
+    
+    methodsContainer: {
+        gap: spacing.sm,
+        paddingHorizontal: spacing.md,
     },
-    modalText: {
-        fontSize: 18,
-        marginBottom: 20,
-    },
-    closeButton: {
-        width: '100%',
-        backgroundColor: '#da330d',
-        padding: 10,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    closeButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-    },
-    cardMethodText: {
-        color: '#052BC2',
-        fontSize: 16,
-    },
-    methods: {
+    
+    methodButton: {
         flexDirection: 'row',
-        gap: 8,
-        padding: 20,
-    }
+        alignItems: 'center',
+        paddingVertical: spacing.lg,
+        paddingHorizontal: spacing.lg,
+        backgroundColor: colors.background.secondary,
+        borderRadius: borderRadius.lg,
+        borderWidth: 1,
+        borderColor: colors.neutral[200],
+        ...shadows.sm,
+    },
+    
+    methodIcon: {
+        width: 48,
+        height: 48,
+        borderRadius: borderRadius.md,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: spacing.lg,
+    },
+    
+    methodInfo: {
+        flex: 1,
+        gap: spacing.xs,
+    },
+    
+    arrowContainer: {
+        width: 24,
+        height: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
-
-export default ModalMethod;

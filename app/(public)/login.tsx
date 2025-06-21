@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, StyleSheet, TextInput, Alert, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -8,6 +8,10 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { UserCredentialsDTO } from '@api/DTOs/credentionsDTO';
 import useErrorStore from 'store/errorStore';
+import { colors, spacing, borderRadius, shadows } from '../../utils/designSystem';
+import Text from '../../components/ui/base/Text';
+import Button from '../../components/ui/base/Button';
+import Card from '../../components/ui/base/Card';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -17,115 +21,234 @@ const Login: React.FC = () => {
     const { signIn } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    // const [userInfo, setUserInfo] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
         clientId: '1000500310954-b0b5dqdbn3665jsapn3pim3s3ehubs1l.apps.googleusercontent.com',
         redirectUri: 'https://auth.expo.io/@matheussds/myfin',
     });
     const { clearError } = useErrorStore();
-
     const router = useRouter();
 
     const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert('Erro', 'Por favor, preencha todos os campos');
+            return;
+        }
+
+        setLoading(true);
         try {
-            //Definir os tipos dos dados de resposta UserDTO
-            //o response.data deve ser do tipo UserDTO
             const response: { data: UserCredentialsDTO } = await axios.post(apiUrl + '/api/users/auth/login', { email, password });
             const { token, user } = response.data;
 
             if (!user.guid) {
-                Alert.alert("Usuário sem identificador único")
-                return
+                Alert.alert("Erro", "Usuário sem identificador único");
+                return;
             }
 
-            await signIn(token, user.guid, user); // Chama a função para marcar como autenticado
-            router.replace('/'); // Redireciona para a tela inicial após o login
+            await signIn(token, user.guid, user);
+            router.replace('/');
         } catch (error) {
             console.error('Erro ao fazer login:', error);
+            Alert.alert('Erro', 'Email ou senha incorretos');
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
         console.log("Login renderizada");
         clearError();
-    }, [])
+    }, []);
 
     return (
-        <View style={styles.container}>
-            <Text>Acessar</Text>
-            <View style={{ width: '100%', alignItems: 'center' }}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Senha"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
-            </View>
-            <TouchableOpacity style={[styles.button, styles.buttonLogin]} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Entrar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, styles.buttonGoogle]} onPress={() => promptAsync()}>
-                <MaterialCommunityIcons name="google" size={24} color="white" />
-                <Text style={styles.buttonText}>Acessar com Google</Text>
-            </TouchableOpacity>
-            <View style={styles.separator} />
-            <TouchableOpacity style={[styles.button, styles.buttonGoogle]} onPress={() => router.push('/signup')}>
-                <MaterialCommunityIcons name="account-plus" size={24} color="white" />
-                <Text style={styles.buttonText}>Cadastre-se</Text>
-            </TouchableOpacity>
-        </View>
-    )
+        <SafeAreaView style={styles.container}>
+            <KeyboardAvoidingView 
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.keyboardView}
+            >
+                <ScrollView 
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text variant="h1" color="primary" weight="bold" align="center">
+                            MyFin
+                        </Text>
+                        <Text variant="body" color="secondary" align="center" style={styles.subtitle}>
+                            Gerencie suas finanças de forma simples e eficiente
+                        </Text>
+                    </View>
+
+                    {/* Formulário */}
+                    <Card variant="elevated" style={styles.formCard}>
+                        <Text variant="h3" color="primary" weight="semibold" align="center" style={styles.formTitle}>
+                            Acessar Conta
+                        </Text>
+
+                        {/* Campo Email */}
+                        <View style={styles.inputContainer}>
+                            <Text variant="label" color="primary" style={styles.inputLabel}>
+                                Email
+                            </Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Digite seu email"
+                                value={email}
+                                onChangeText={setEmail}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                            />
+                        </View>
+
+                        {/* Campo Senha */}
+                        <View style={styles.inputContainer}>
+                            <Text variant="label" color="primary" style={styles.inputLabel}>
+                                Senha
+                            </Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Digite sua senha"
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry
+                                autoCapitalize="none"
+                            />
+                        </View>
+
+                        {/* Botão de Login */}
+                        <Button
+                            title="Entrar"
+                            onPress={handleLogin}
+                            variant="primary"
+                            size="large"
+                            loading={loading}
+                            fullWidth
+                            style={styles.loginButton}
+                        />
+
+                        {/* Separador */}
+                        <View style={styles.separator}>
+                            <View style={styles.separatorLine} />
+                            <Text variant="caption" color="secondary" style={styles.separatorText}>
+                                ou
+                            </Text>
+                            <View style={styles.separatorLine} />
+                        </View>
+
+                        {/* Botão Google */}
+                        <Button
+                            title="Continuar com Google"
+                            onPress={() => promptAsync()}
+                            variant="outline"
+                            size="large"
+                            fullWidth
+                            icon={<MaterialCommunityIcons name="google" size={20} color={colors.primary[500]} />}
+                            style={styles.googleButton}
+                        />
+
+                        {/* Link para cadastro */}
+                        <View style={styles.signupContainer}>
+                            <Text variant="bodySmall" color="secondary" align="center">
+                                Não tem uma conta?{' '}
+                            </Text>
+                            <Button
+                                title="Cadastre-se"
+                                onPress={() => router.push('/signup')}
+                                variant="secondary"
+                                size="small"
+                            />
+                        </View>
+                    </Card>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 15,
+        backgroundColor: colors.background.secondary,
     },
+    
+    keyboardView: {
+        flex: 1,
+    },
+    
+    scrollContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        padding: spacing.lg,
+    },
+    
+    header: {
+        alignItems: 'center',
+        marginBottom: spacing['2xl'],
+    },
+    
+    subtitle: {
+        marginTop: spacing.sm,
+        paddingHorizontal: spacing.lg,
+    },
+    
+    formCard: {
+        padding: spacing.lg,
+    },
+    
+    formTitle: {
+        marginBottom: spacing.lg,
+    },
+    
+    inputContainer: {
+        marginBottom: spacing.md,
+    },
+    
+    inputLabel: {
+        marginBottom: spacing.xs,
+    },
+    
     input: {
-        height: 40,
-        marginBottom: 15,
-        paddingHorizontal: 10,
-        width: '80%',
-        borderRadius: 5,
-        backgroundColor: '#f9f9f9',
-    },
-    separator: {
-        height: 1,
-        backgroundColor: 'black',
-        marginVertical: 10,
-        width: '80%',
-    },
-    button: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 15,
-        borderRadius: 5,
-        width: '80%',
-        gap: 10
-    },
-    buttonGoogle: {
-        backgroundColor: '#4285F4',
-    },
-    buttonLogin: {
-        backgroundColor: '#000',
-    },
-    buttonText: {
-        color: '#FFFFFF',
+        backgroundColor: colors.background.secondary,
+        borderRadius: borderRadius.md,
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.neutral[300],
         fontSize: 16,
-    }
+        color: colors.text.primary,
+    },
+    
+    loginButton: {
+        marginTop: spacing.md,
+    },
+    
+    separator: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: spacing.lg,
+    },
+    
+    separatorLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: colors.neutral[300],
+    },
+    
+    separatorText: {
+        marginHorizontal: spacing.md,
+    },
+    
+    googleButton: {
+        marginBottom: spacing.lg,
+    },
+    
+    signupContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
 
 export default Login;

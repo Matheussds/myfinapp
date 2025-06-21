@@ -1,101 +1,118 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonCircle from "@ui/ButtonCircle";
 import ModalCategory from "@ui/modals/ModalCategory";
-import { getCategories } from "@api";
 import { Category } from "entity";
 import * as SecureStore from 'expo-secure-store';
+import { GENERAL_CATEGORY_GUID } from "@utils/constants";
+import { colors, spacing, borderRadius, shadows } from "../../../utils/designSystem";
 
 interface Props {
     onSelectCategory: (categoryGUID: string) => void;
+    categories: Category[];
+    selectedCategoryGUID: string | null;
+    isLoading: boolean;
 }
 
-export default function HeaderContext({ onSelectCategory }: Props) {
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [categorySelected, setCategorySelected] = useState<Category | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+export default function HeaderContext({ 
+    onSelectCategory, 
+    categories, 
+    selectedCategoryGUID,
+    isLoading 
+}: Props) {
     const [categoryIndex, setCategoryIndex] = useState<number | null>(null);
     const [openModalCategory, setOpenModalCategory] = useState(false);
 
     const handleAddedCategory = async (category: Category) => {
-        setCategories([...categories, category]);
-        setCategorySelected(category);
-        await SecureStore.setItemAsync('selectedCategory', JSON.stringify(category));
+        console.log('handleAddedCategory chamado com:', category);
         setOpenModalCategory(false);
-    }
-
-    const loadCategories = async () => {
-        setCategoryIndex(null);
-        try {
-            setIsLoading(true);
-            const storedCategory = await SecureStore.getItemAsync('selectedCategory');
-            const storedCategoryParse : Category | null = JSON.parse(storedCategory || 'null');
-            storedCategoryParse && setCategorySelected(storedCategoryParse);
-            const categories = await getCategories();
-            setCategories(categories);
-            const selectedCategoryIndex = categories.findIndex((cat) => cat.guid === storedCategoryParse?.guid);
-            setCategoryIndex(selectedCategoryIndex >= 0 ? selectedCategoryIndex : categories.length > 0 ? 0 : null);
-            if (!storedCategory && categories.length > 0) {
-                categories[0].guid && onSelectCategory(categories[0].guid);
-            } else if (storedCategory && selectedCategoryIndex >= 0) {
-                storedCategoryParse?.guid && onSelectCategory(storedCategoryParse.guid);
-            }
-            setIsLoading(false);
-        } catch (error) {
-            setIsLoading(false);
-            Alert.alert("Error", "Failed to load categories. Please try again.");
-        }
+        // A nova categoria será adicionada pelo componente pai
     }
 
     const chooseCategory = async (position: 'PREVIOUS' | 'NEXT') => {
+        console.log('=== chooseCategory INICIADO ===');
+        console.log('Posição:', position);
+        console.log('Índice atual:', categoryIndex);
+        console.log('Total de categorias:', categories.length);
+        
         if (categoryIndex !== null) {
-            if (position === 'PREVIOUS' && categoryIndex === 0) return;
-            if (position === 'NEXT' && categoryIndex === categories.length - 1) return;
+            if (position === 'PREVIOUS' && categoryIndex === 0) {
+                console.log('Já está na primeira categoria');
+                return;
+            }
+            if (position === 'NEXT' && categoryIndex === categories.length - 1) {
+                console.log('Já está na última categoria');
+                return;
+            }
 
-            const category = categories[position === 'PREVIOUS' ? categoryIndex - 1 : categoryIndex + 1];
+            const newIndex = position === 'PREVIOUS' ? categoryIndex - 1 : categoryIndex + 1;
+            const category = categories[newIndex];
+            
+            console.log('Nova categoria selecionada:', category);
+            
             if (category && category.guid) {
-                setCategoryIndex(position === 'PREVIOUS' ? categoryIndex - 1 : categoryIndex + 1);
+                setCategoryIndex(newIndex);
+                console.log('Chamando onSelectCategory com:', category.guid);
                 onSelectCategory(category.guid);
                 await SecureStore.setItemAsync('selectedCategory', JSON.stringify(category));
+                console.log('Categoria salva no storage');
             }
         }
+        console.log('=== chooseCategory FINALIZADO ===');
     }
 
-    useEffect(() => {        
-        loadCategories();
-    }, []);
-
+    // Atualiza o índice da categoria quando selectedCategoryGUID muda
     useEffect(() => {
-        const categoryIndex = categories.findIndex((cat) => cat.guid === categorySelected?.guid)
-        if (categoryIndex >= 0) {
-            setCategoryIndex(categoryIndex);
-            if (categorySelected && categorySelected.guid) {
-                onSelectCategory(categorySelected.guid);
-            }
+        console.log('=== HeaderContext useEffect selectedCategoryGUID ===');
+        console.log('selectedCategoryGUID:', selectedCategoryGUID);
+        console.log('Categorias disponíveis:', categories.map(c => ({ guid: c.guid, name: c.name })));
+        
+        if (selectedCategoryGUID && categories.length > 0) {
+            const index = categories.findIndex(cat => cat.guid === selectedCategoryGUID);
+            console.log('Índice encontrado:', index);
+            setCategoryIndex(index >= 0 ? index : 0);
         }
-    }, [categorySelected]);
+        console.log('=== HeaderContext useEffect FINALIZADO ===');
+    }, [selectedCategoryGUID, categories]);
 
     return (
         <>
             <View style={styles.cardHeader}>
-                <ButtonCircle backgroundColor='#000' onPressAdd={() => setOpenModalCategory(true)} />
-                <View style={{ flex: 1, flexDirection: 'row', height: 70, alignItems: "center", justifyContent: 'center', backgroundColor: '#000', borderTopStartRadius: 50, borderBottomStartRadius: 50 }}>
+                <ButtonCircle backgroundColor={colors.neutral[900]} onPressAdd={() => setOpenModalCategory(true)} />
+                <View style={styles.categoryContainer}>
                     {isLoading
                         ?
-                        <ActivityIndicator size="large" color="#fff" />
+                        <ActivityIndicator size="large" color={colors.text.inverse} />
                         :
                         <>
-
-                            <TouchableOpacity disabled={categoryIndex === null || categoryIndex === 0} style={[{ flex: 1, alignItems: 'flex-start', paddingStart: 20 }]} onPress={() => chooseCategory('PREVIOUS')}>
-                                <Ionicons name="chevron-back" size={24} color={categoryIndex === null || categoryIndex === 0 ? "#000" : "#fff"} />
+                            <TouchableOpacity 
+                                disabled={categoryIndex === null || categoryIndex === 0} 
+                                style={styles.navigationButton} 
+                                onPress={() => chooseCategory('PREVIOUS')}
+                            >
+                                <Ionicons 
+                                    name="chevron-back" 
+                                    size={24} 
+                                    color={categoryIndex === null || categoryIndex === 0 ? colors.neutral[400] : colors.text.inverse} 
+                                />
                             </TouchableOpacity>
-                            {/* Ao tocar na categoria abrir modal com todas as categorias para escolher uma */}
-                            <Text style={styles.categoryText}>{categoryIndex != null ? categories[categoryIndex].name : '----'}</Text>
-                            <TouchableOpacity disabled={categoryIndex === null || categoryIndex === categories.length - 1} style={{ flex: 1, alignItems: 'flex-end', paddingEnd: 20 }} onPress={() => chooseCategory('NEXT')}>
-                                <Ionicons name="chevron-forward" size={24} color={categoryIndex === null || categoryIndex === categories.length - 1 ? "#000" : "#fff"} />
+                            <Text style={styles.categoryText}>
+                                {categoryIndex != null ? categories[categoryIndex].name : '----'}
+                            </Text>
+                            <TouchableOpacity 
+                                disabled={categoryIndex === null || categoryIndex === categories.length - 1} 
+                                style={styles.navigationButton} 
+                                onPress={() => chooseCategory('NEXT')}
+                            >
+                                <Ionicons 
+                                    name="chevron-forward" 
+                                    size={24} 
+                                    color={categoryIndex === null || categoryIndex === categories.length - 1 ? colors.neutral[400] : colors.text.inverse} 
+                                />
                             </TouchableOpacity>
-                        </>}
+                        </>
+                    }
                 </View>
             </View>
             <ModalCategory modalVisible={openModalCategory} onSetVisible={setOpenModalCategory} onAddCategory={handleAddedCategory} />
@@ -106,16 +123,36 @@ export default function HeaderContext({ onSelectCategory }: Props) {
 const styles = StyleSheet.create({
     cardHeader: {
         flexDirection: 'row',
-        gap: 8,
+        gap: spacing.sm,
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        paddingStart: 8
+        paddingHorizontal: spacing.sm,
+        marginBottom: spacing.md,
+    },
+    categoryContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        height: 70,
+        alignItems: "center",
+        justifyContent: 'center',
+        backgroundColor: colors.neutral[900],
+        borderTopLeftRadius: borderRadius.xl,
+        borderBottomLeftRadius: borderRadius.xl,
+        borderTopRightRadius: borderRadius.xl,
+        borderBottomRightRadius: borderRadius.xl,
+        ...shadows.sm,
+    },
+    navigationButton: {
+        flex: 1,
+        alignItems: 'center',
+        paddingHorizontal: spacing.md,
     },
     categoryText: {
         fontSize: 14, 
-        color: '#fff', 
+        color: colors.text.inverse, 
         flex: 1, 
-        textAlign: 'center' 
+        textAlign: 'center',
+        fontWeight: '500',
     }
 })

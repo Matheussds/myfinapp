@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import MyModal from "./Modal";
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Category } from "entity";
@@ -49,7 +49,7 @@ export default function ModalCategory(props: Props) {
     }, [props.modalVisible])
 
     return (
-        <MyModal modalVisible={modalVisible}>
+        <MyModal modalVisible={modalVisible} onClose={() => onSetModalVisible(false)}>
             {isLoading
                 ?
                 <View style={{ width: '100%', alignItems: 'center', padding: 20 }}>

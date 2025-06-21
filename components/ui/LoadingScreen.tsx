@@ -1,11 +1,51 @@
 import React from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { colors, spacing } from '../../utils/designSystem';
+import Text from './base/Text';
 
-export default function LoadingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" />
-      <Text>Carregando...</Text>
-    </View>
-  );
+interface LoadingScreenProps {
+    message?: string;
+    size?: 'small' | 'large';
 }
+
+export default function LoadingScreen({ 
+    message = 'Carregando...', 
+    size = 'large' 
+}: LoadingScreenProps) {
+    return (
+        <View style={styles.container}>
+            <View style={styles.content}>
+                <ActivityIndicator 
+                    size={size} 
+                    color={colors.primary[500]} 
+                />
+                <Text 
+                    variant="body" 
+                    color="secondary" 
+                    align="center"
+                    style={styles.message}
+                >
+                    {message}
+                </Text>
+            </View>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: colors.background.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    
+    content: {
+        alignItems: 'center',
+        padding: spacing.lg,
+    },
+    
+    message: {
+        marginTop: spacing.md,
+    },
+});
